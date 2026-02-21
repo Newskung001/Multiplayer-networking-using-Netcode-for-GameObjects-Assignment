@@ -125,3 +125,8 @@ $RECYCLE.BIN/
 # Custom rules (everything added below won't be overriden by 'Generate .gitignore File' if you use 'Update' option)
 plans/
 /W5Build
+*.7z
+Assets/Scripts/ScriptsFromSW1.5.7z.meta
+Assets/Scripts/Scripts.7z.meta
+Assets/ScriptsFromSW1.5.7z.meta
+Assets/ScriptsScriptsFromSW1.5.7z.meta
