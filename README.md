@@ -6,6 +6,10 @@ A beginner-friendly Unity project demonstrating player input handling with Unity
 
 This educational project teaches the fundamentals of implementing player movement and networking in Unity. It covers how to set up player input using the **Invoke Unity Events** approach, configure networked game objects, and create responsive movement mechanics that work in both single-player and multiplayer environments.
 
+## 📺 Demo Video
+
+Watch a demonstration of this project in action: [YouTube Demo Video](https://youtu.be/rHt5OeKh73o)
+
 ## Key Features
 
 - **Player Input with Invoke Unity Events** - Uses Unity's new Input System with event-based input handling for clean, decoupled code
