@@ -12,6 +12,7 @@ public class ConnectionManager : MonoBehaviour
     [SerializeField] TMP_InputField usernameInput;
     [SerializeField] GameObject loginPanel;
     [SerializeField] GameObject leaveButton;
+    [SerializeField] private TMP_Text errorText; // optional (can be null)
     
     private void SetConnectionData(string username)
     {
@@ -156,5 +157,93 @@ public class ConnectionManager : MonoBehaviour
         // If additional approval steps are needed, set this to true until the additional steps are complete
         // once it transitions from true to false the connection approval response will be processed.
         response.Pending = false;
+    }
+    
+    private void OnEnable()
+    {
+        if (NetworkManager.Singleton == null) return;
+
+        NetworkManager.Singleton.OnServerStarted += HandleServerStarted;
+        NetworkManager.Singleton.OnClientConnectedCallback += HandleClientConnected;
+        NetworkManager.Singleton.OnClientDisconnectCallback += HandleClientDisconnected;
+    }
+    
+    private void OnDisable()
+    {
+        if (NetworkManager.Singleton == null) return;
+        
+        NetworkManager.Singleton.ConnectionApprovalCallback -= ApprovalCheck;
+        NetworkManager.Singleton.OnServerStarted -= HandleServerStarted;
+        NetworkManager.Singleton.OnClientConnectedCallback -= HandleClientConnected;
+        NetworkManager.Singleton.OnClientDisconnectCallback -= HandleClientDisconnected;
+    }
+    
+    private void HandleServerStarted()
+    {
+        if (NetworkManager.Singleton.IsHost)
+        {
+            SetUIConnected(true);
+        }
+    }
+    
+    private void HandleClientConnected(ulong clientId)
+    {
+        if (clientId == NetworkManager.Singleton.LocalClientId)
+        {
+            SetUIConnected(true);
+        }
+    }
+    
+    private void HandleClientDisconnected(ulong clientId)
+    {
+        if (clientId == NetworkManager.Singleton.LocalClientId)
+        {
+            SetUIConnected(false);
+
+            string reason = NetworkManager.Singleton.DisconnectReason;
+
+            if (!string.IsNullOrEmpty(reason))
+                SetError(reason);
+        }
+        if (NetworkManager.Singleton != null && NetworkManager.Singleton.IsServer)
+        {
+            UntrackNameOnServer(clientId);
+        }
+    }
+
+    private void SetUIConnected(bool connected)
+    {
+        loginPanel.SetActive(!connected);
+        leaveButton.SetActive(connected);
+
+        if (connected)
+            ClearError();
+    }
+    
+    private void SetError(string message)
+    {
+        if (errorText != null)
+            errorText.text = message;
+
+        Debug.LogWarning(message);
+    }
+
+    private void ClearError()
+    {
+        if (errorText != null)
+            errorText.text = "";
+    }
+    
+    public void OnLeaveButtonClick()
+    {
+        ClearError();
+
+        if (NetworkManager.Singleton == null)
+            return;
+
+        // Shutdown works for both host and client
+        NetworkManager.Singleton.Shutdown();
+        
+        SetUIConnected(false);
     }
 }
