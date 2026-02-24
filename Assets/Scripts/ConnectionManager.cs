@@ -203,12 +203,30 @@ public class ConnectionManager : MonoBehaviour
             string reason = NetworkManager.Singleton.DisconnectReason;
 
             if (!string.IsNullOrEmpty(reason))
-                SetError(reason);
+            {
+                // Simplify technical disconnect reasons for better UX
+                string displayReason = SimplifyDisconnectReason(reason);
+                SetError(displayReason);
+            }
         }
         if (NetworkManager.Singleton != null && NetworkManager.Singleton.IsServer)
         {
             UntrackNameOnServer(clientId);
         }
+    }
+
+    private string SimplifyDisconnectReason(string reason)
+    {
+        // Convert technical messages to user-friendly ones
+        if (reason.Contains("TransportShutdown"))
+            return "Transport was shutdown.";
+        if (reason.Contains("ClosedByRemote"))
+            return "Connection closed by remote.";
+        if (reason.Contains("NetworkConnectionManager was shutdown"))
+            return "Connection manager was shutdown.";
+        
+        // Return original if no simplification needed
+        return reason;
     }
 
     private void SetUIConnected(bool connected)
@@ -223,7 +241,10 @@ public class ConnectionManager : MonoBehaviour
     private void SetError(string message)
     {
         if (errorText != null)
+        {
             errorText.text = message;
+            errorText.color = Color.red;
+        }
 
         Debug.LogWarning(message);
     }
