@@ -8,7 +8,9 @@ This educational project teaches the fundamentals of implementing player movemen
 
 ## 📺 Demo Video
 
-Watch a demonstration of this project in action: [YouTube Demo Video](https://youtu.be/rHt5OeKh73o)
+Watch a demonstration of this project in action:
+- [YouTube Demo Video v1.3.0 - Connection Approval Mode](https://youtu.be/lIrLQUzu-OM)
+- [YouTube Demo Video](https://youtu.be/rHt5OeKh73o)
 
 ## Key Features
 
@@ -61,6 +63,25 @@ This project is part of a Unity learning curriculum focusing on:
 - Physics-based character controllers
 
 ## Changelog
+
+## [v1.3.0] - 2026-02-27
+
+### Added
+- **ApprovalMode Enum**: New enum with `AlwaysApprove` and `ManualApprove` options for connection approval control
+- **Connection Settings**: Configurable approval mode via Inspector with descriptive tooltip
+- **Console Command**: `set-approve` command to toggle manual approval state at runtime
+- **Host Auto-Approval**: Host connection is now automatically approved (Netcode cannot reject itself)
+- **Connection Approval Enforcement**: Connection approval is now force-enabled in code on Start
+
+### Changed
+- **ApprovalCheck Refactoring**: Restructured approval logic with clearer step-by-step validation flow
+- **SetupApprovedResponse Method**: Extracted response setup into dedicated helper method for code reuse
+- **Debug Logging**: Enhanced logging with "incoming Name =" prefix for clearer debugging
+- **Connection Data Processing**: Improved payload handling and error messaging
+
+### Security
+- **Manual Approval Mode**: Servers can now require manual approval via console before accepting connections
+- **Auto Approval Mode**: Optional always-approve mode for development/testing scenarios
 
 ## [v1.2.0] - 2026-02-25
 
