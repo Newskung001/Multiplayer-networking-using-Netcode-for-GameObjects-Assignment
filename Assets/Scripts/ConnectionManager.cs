@@ -14,6 +14,26 @@ public class ConnectionManager : MonoBehaviour
     [SerializeField] GameObject leaveButton;
     [SerializeField] private TMP_Text errorText; // optional (can be null)
     
+    public enum ApprovalMode
+    {
+        AlwaysApprove,    // Always approve connections automatically
+        ManualApprove     // Require manual approval via console command
+    }
+
+    [Header("Connection Settings")]
+    [Tooltip("Determines whether connections are automatically approved or require manual approval")]
+    public ApprovalMode approvalMode = ApprovalMode.ManualApprove;
+
+    private bool isApproveConnection = false;
+    [Command("set-approve")]
+    public bool SetIsApproveConnection()
+    {
+        isApproveConnection = !isApproveConnection;
+        string state = isApproveConnection ? "enabled" : "disabled";
+        Debug.Log($"Connection approval is now {state}");
+        return isApproveConnection;
+    }
+    
     private void SetConnectionData(string username)
     {
         NetworkManager.Singleton.NetworkConfig.ConnectionData =
@@ -36,16 +56,14 @@ public class ConnectionManager : MonoBehaviour
         NetworkManager.Singleton.StartClient();
     }
     
-    private bool isApproveConnection = false;
-    [Command("set-approve")]
-    public bool SetIsApproveConnection()
-    {
-        isApproveConnection = !isApproveConnection;
-        return isApproveConnection;
-    }
-    
     private void Start()
     {
+        // Force enable Connection Approval in code
+        if (NetworkManager.Singleton != null)
+        {
+            NetworkManager.Singleton.NetworkConfig.ConnectionApproval = true;
+        }
+        
         NetworkManager.Singleton.ConnectionApprovalCallback += ApprovalCheck;
     }
     
@@ -119,8 +137,17 @@ public class ConnectionManager : MonoBehaviour
         NetworkManager.ConnectionApprovalResponse response)
     {
         string incomingName = DecodePayloadToString(request.Payload);
-        print("incoming Name = " + incomingName);
+        Debug.Log("incoming Name =  " + incomingName);
         
+        // Check if this is the Host
+        // Host connection is always approved by Netcode (cannot reject itself)
+        if (request.ClientNetworkId == NetworkManager.ServerClientId)
+        {
+            SetupApprovedResponse(response, request.ClientNetworkId, incomingName);
+            return;
+        }
+        
+        // 1. Check for duplicate name (Lab 2)
         if (_connectedNames.Contains(incomingName))
         {
             response.Approved = false;
@@ -129,33 +156,40 @@ public class ConnectionManager : MonoBehaviour
             return;
         }
         
-        // The client identifier to be authenticated
-        var clientId = request.ClientNetworkId;
-
-        // Additional connection data defined by user code
-        var connectionData = request.Payload;
-
-        // Your approval logic determines the following values
+        // 2. Check approval based on the selected mode
+        switch (approvalMode)
+        {
+            case ApprovalMode.AlwaysApprove:
+                // Always approve in this mode
+                break;
+                
+            case ApprovalMode.ManualApprove:
+                // Check for console approval (Lab 1)
+                // If isApproveConnection is false then reject immediately
+                if (!isApproveConnection)
+                {
+                    response.Approved = false;
+                    response.Reason = "Connection not approved by server (Use set-approve command)";
+                    response.Pending = false;
+                    return;
+                }
+                break;
+        }
+        
+        // 3. If passed all checks then approve
+        SetupApprovedResponse(response, request.ClientNetworkId, incomingName);
+    }
+    
+    private void SetupApprovedResponse(NetworkManager.ConnectionApprovalResponse response, ulong clientId, string incomingName)
+    {
         response.Approved = true;
         response.CreatePlayerObject = true;
-
-        // The Prefab hash value of the NetworkPrefab, if null the default NetworkManager player Prefab is used
         response.PlayerPrefabHash = null;
-
-        // Position to spawn the player object (if null it uses default of Vector3.zero)
         response.Position = Vector3.zero;
-
-        // Rotation to spawn the player object (if null it uses the default of Quaternion.identity)
         response.Rotation = Quaternion.identity;
-
-        // If response.Approved is false, you can provide a message that explains the reason why via ConnectionApprovalResponse.Reason
-        // On the client-side, NetworkManager.DisconnectReason will be populated with this message via DisconnectReasonMessage
-        response.Reason = "Some reason for not approving the client";
+        response.Reason = string.Empty;
         
-        TrackNameOnServer(request.ClientNetworkId, incomingName);
-
-        // If additional approval steps are needed, set this to true until the additional steps are complete
-        // once it transitions from true to false the connection approval response will be processed.
+        TrackNameOnServer(clientId, incomingName);
         response.Pending = false;
     }
     
