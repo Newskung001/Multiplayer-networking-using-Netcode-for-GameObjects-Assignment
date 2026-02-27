@@ -9,6 +9,7 @@ This educational project teaches the fundamentals of implementing player movemen
 ## 📺 Demo Video
 
 Watch a demonstration of this project in action:
+- [YouTube Demo Video v1.3.1 - Player Limits & Duplicate Name Check](https://youtu.be/h2C8v7wJeqk)
 - [YouTube Demo Video v1.3.0 - Connection Approval Mode](https://youtu.be/lIrLQUzu-OM)
 - [YouTube Demo Video](https://youtu.be/rHt5OeKh73o)
 
@@ -18,6 +19,9 @@ Watch a demonstration of this project in action:
 - **NetworkObject/NetworkTransform Setup** - Proper configuration for synchronizing player position and rotation across the network
 - **WASD Movement** - Smooth character movement with rotation towards movement direction
 - **Jump Mechanics** - Physics-based jumping with ground detection using sphere checks
+- **Connection Approval Mode** - Configurable approval mode with Manual Approve and Always Approve options
+- **Player Limits** - Configurable maximum player limit to prevent server overload
+- **Duplicate Name Prevention** - Server-side validation to prevent duplicate usernames
 
 ## Prerequisites
 
@@ -64,68 +68,4 @@ This project is part of a Unity learning curriculum focusing on:
 
 ## Changelog
 
-## [v1.3.0] - 2026-02-27
-
-### Added
-- **ApprovalMode Enum**: New enum with `AlwaysApprove` and `ManualApprove` options for connection approval control
-- **Connection Settings**: Configurable approval mode via Inspector with descriptive tooltip
-- **Console Command**: `set-approve` command to toggle manual approval state at runtime
-- **Host Auto-Approval**: Host connection is now automatically approved (Netcode cannot reject itself)
-- **Connection Approval Enforcement**: Connection approval is now force-enabled in code on Start
-
-### Changed
-- **ApprovalCheck Refactoring**: Restructured approval logic with clearer step-by-step validation flow
-- **SetupApprovedResponse Method**: Extracted response setup into dedicated helper method for code reuse
-- **Debug Logging**: Enhanced logging with "incoming Name =" prefix for clearer debugging
-- **Connection Data Processing**: Improved payload handling and error messaging
-
-### Security
-- **Manual Approval Mode**: Servers can now require manual approval via console before accepting connections
-- **Auto Approval Mode**: Optional always-approve mode for development/testing scenarios
-
-## [v1.2.0] - 2026-02-25
-
-### Added
-- **ConnectionManager.cs**: New script implementing comprehensive network connection management with connection approval, error handling, and state management for multiplayer sessions
-- **UI Connection System**: Complete player connection flow including lobby screen, connection status indicators, and error messaging
-- **Network Configuration**: Dedicated server and client configuration management system
-- **Connection Approval Logic**: Custom connection validation with unique player identifiers and session management
-- **Error Handling Framework**: Comprehensive network error detection and user feedback system
-
-### Changed
-- **Player Controller Integration**: Enhanced existing physics-based character controllers with network synchronization capabilities
-- **Network Session Management**: Improved player spawn coordination and session cleanup procedures
-- **Connection State Tracking**: Enhanced real-time connection status monitoring and display updates
-- **Lobby System Architecture**: Refactored connection flow from basic join/leave to managed lobby experience
-
-### Fixed
-- **Connection Stability Issues**: Resolved intermittent disconnection problems during high-latency conditions
-- **Player Synchronization**: Fixed desync issues when multiple players join simultaneously
-- **State Management**: Corrected connection state persistence across scene transitions
-- **Error Recovery**: Implemented automatic retry mechanisms for temporary connection failures
-
-### Security
-- **Connection Validation**: Added server-side player authentication and validation checks
-- **Session Integrity**: Implemented unique session token generation and verification
-- **Rate Limiting**: Added connection attempt limiting to prevent abuse
-
-## [v1.1.0] - 2026-02-24
-
-### Added
-- **Physics-based Character Controllers**: Implementation of realistic movement with collision detection
-- **Network Synchronization**: Real-time player position and state replication across clients
-- **Dedicated Server Support**: Headless server deployment capabilities
-- **Connection Status Monitoring**: Real-time connection quality and latency tracking
-
-### Changed
-- **Architecture**: Migrated from basic peer-to-peer to client-server networking model
-- **Performance**: Optimized network message frequency and data compression
-- **Scalability**: Improved support for larger player counts
-
-## [v1.0.0] - 2026-02-23
-
-### Initial Release
-- **Core Networking Foundation**: Basic Netcode for GameObjects implementation
-- **Player Prefab Setup**: Network-ready player objects with movement controls
-- **Scene Management**: Multi-scene networking support
-- **Basic Multiplayer Functionality**: Player spawning and basic interaction
+For detailed version history and updates, see [CHANGELOG.md](./CHANGELOG.md).
