@@ -18,7 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Documentation**: Added XML documentation for the `_connectedNames` field explaining its dual purpose
 
 ### Git Commit
-- Commit: `d600ec008679a1dad1b1cf5ec9f2211023479717`
+- Commit: [`d600ec0`](https://github.com/Newskung001/Multiplayer-networking-using-Netcode-for-GameObjects-Assignment/commit/d600ec008679a1dad1b1cf5ec9f2211023479717)
 - Author: Newskung001
 - Date: 2026-02-28
 
@@ -42,6 +42,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Security
 - **Manual Approval Mode**: Servers can now require manual approval via console before accepting connections
 - **Auto Approval Mode**: Optional always-approve mode for development/testing scenarios
+
+### Git Commit
+- Commit: [`adacdea`](https://github.com/Newskung001/Multiplayer-networking-using-Netcode-for-GameObjects-Assignment/commit/adacdea)
+- Author: Newskung001
+- Date: 2026-02-27
 
 ---
 
@@ -71,6 +76,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Session Integrity**: Implemented unique session token generation and verification
 - **Rate Limiting**: Added connection attempt limiting to prevent abuse
 
+### Git Commit
+- Commit: [`67ab28a`](https://github.com/Newskung001/Multiplayer-networking-using-Netcode-for-GameObjects-Assignment/commit/67ab28a)
+- Author: Newskung001
+- Date: 2026-02-23
+
 ---
 
 ## [v1.1.0] - 2026-02-24
@@ -86,6 +96,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Performance**: Optimized network message frequency and data compression
 - **Scalability**: Improved support for larger player counts
 
+### Git Commit
+- Commit: [`0800691`](https://github.com/Newskung001/Multiplayer-networking-using-Netcode-for-GameObjects-Assignment/commit/0800691)
+- Author: Newskung001
+- Date: 2026-02-21
+
 ---
 
 ## [v1.0.0] - 2026-02-23
@@ -95,3 +110,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Player Prefab Setup**: Network-ready player objects with movement controls
 - **Scene Management**: Multi-scene networking support
 - **Basic Multiplayer Functionality**: Player spawning and basic interaction
+
+### Git Commit
+- Commit: [`6673b48`](https://github.com/Newskung001/Multiplayer-networking-using-Netcode-for-GameObjects-Assignment/commit/6673b48)
+- Author: Newskung001
+- Date: 2026-02-20
