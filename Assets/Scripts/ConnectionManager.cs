@@ -24,6 +24,14 @@ public class ConnectionManager : MonoBehaviour
     [Tooltip("Determines whether connections are automatically approved or require manual approval")]
     public ApprovalMode approvalMode = ApprovalMode.ManualApprove;
 
+    [Header("Player Limits")]
+    [SerializeField] private int maxPlayers = 6;
+    public int MaxPlayers => maxPlayers;
+
+    /// <summary>
+    /// Tracks connected player names to prevent duplicates and enforce player limits.
+    /// Used for both duplicate username validation and player count enforcement.
+    /// </summary>
     private bool isApproveConnection = false;
     [Command("set-approve")]
     public bool SetIsApproveConnection()
@@ -58,6 +66,13 @@ public class ConnectionManager : MonoBehaviour
     
     private void Start()
     {
+        // Validate maxPlayers configuration to prevent invalid values
+        if (maxPlayers <= 0)
+        {
+            Debug.LogWarning($"MaxPlayers is set to {maxPlayers}, defaulting to 6");
+            maxPlayers = 6;
+        }
+        
         // Force enable Connection Approval in code
         if (NetworkManager.Singleton != null)
         {
@@ -156,7 +171,27 @@ public class ConnectionManager : MonoBehaviour
             return;
         }
         
-        // 2. Check approval based on the selected mode
+        // 2. Check player count limit (NEW LOGIC)
+        // Enforce maximum player limit to prevent server overload
+        if (_connectedNames.Count >= maxPlayers)
+        {
+            response.Approved = false;
+            response.Reason = "Server Full (Maximum players reached)";
+            response.Pending = false;
+            Debug.Log($"Connection rejected: Server is full. Current players: {_connectedNames.Count}, Max: {maxPlayers}");
+            return;
+        }
+        
+        // 3. Check for duplicate name (Lab 2)
+        if (_connectedNames.Contains(incomingName))
+        {
+            response.Approved = false;
+            response.Reason = "Name already in use";
+            response.Pending = false;
+            return;
+        }
+        
+        // 4. Check approval based on the selected mode
         switch (approvalMode)
         {
             case ApprovalMode.AlwaysApprove:
@@ -176,7 +211,7 @@ public class ConnectionManager : MonoBehaviour
                 break;
         }
         
-        // 3. If passed all checks then approve
+        // 4. If passed all checks then approve
         SetupApprovedResponse(response, request.ClientNetworkId, incomingName);
     }
     
