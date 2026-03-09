@@ -14,6 +14,10 @@ public class ConnectionManager : MonoBehaviour
     [SerializeField] GameObject leaveButton;
     [SerializeField] private TMP_Text errorText; // optional (can be null)
     
+    // spawn points to use when a client joins; populate in the inspector
+    [SerializeField] private Transform[] spawnPoints;
+    [SerializeField] private bool useRandomSpawn = false;
+
     public enum ApprovalMode
     {
         AlwaysApprove,    // Always approve connections automatically
@@ -158,6 +162,8 @@ public class ConnectionManager : MonoBehaviour
         // Host connection is always approved by Netcode (cannot reject itself)
         if (request.ClientNetworkId == NetworkManager.ServerClientId)
         {
+            // host should spawn at default position (0) or first spawn point
+            response.Position = GetSpawnPosition(request.ClientNetworkId);
             SetupApprovedResponse(response, request.ClientNetworkId, incomingName);
             return;
         }
@@ -212,6 +218,7 @@ public class ConnectionManager : MonoBehaviour
         }
         
         // 4. If passed all checks then approve
+        response.Position = GetSpawnPosition(request.ClientNetworkId);
         SetupApprovedResponse(response, request.ClientNetworkId, incomingName);
     }
     
@@ -220,7 +227,8 @@ public class ConnectionManager : MonoBehaviour
         response.Approved = true;
         response.CreatePlayerObject = true;
         response.PlayerPrefabHash = null;
-        response.Position = Vector3.zero;
+        // Position should already be assigned by caller (ApprovalCheck).
+        // No action needed here since caller sets it before invoking.
         response.Rotation = Quaternion.identity;
         response.Reason = string.Empty;
         
@@ -228,6 +236,25 @@ public class ConnectionManager : MonoBehaviour
         response.Pending = false;
     }
     
+    /// <summary>
+    /// Determine a spawn position for a given clientId using a round-robin
+    /// or random selection from the configured array of spawn points.
+    /// </summary>
+    private Vector3 GetSpawnPosition(ulong clientId)
+    {
+        if (spawnPoints == null || spawnPoints.Length == 0)
+            return Vector3.zero;
+
+        if (useRandomSpawn)
+        {
+            int randomIndex = UnityEngine.Random.Range(0, spawnPoints.Length);
+            return spawnPoints[randomIndex].position;
+        }
+
+        int index = (int)(clientId % (ulong)spawnPoints.Length);
+        return spawnPoints[index].position;
+    }
+
     private void OnEnable()
     {
         if (NetworkManager.Singleton == null) return;
