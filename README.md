@@ -9,6 +9,7 @@ This educational project teaches the fundamentals of implementing player movemen
 ## 📺 Demo Video
 
 Watch a demonstration of this project in action:
+- [YouTube Demo Video v1.4.0 - Spawn Points & Prefab Improvements](https://youtu.be/SjlMnAtwjQw)
 - [YouTube Demo Video v1.3.1 - Player Limits & Duplicate Name Check](https://youtu.be/h2C8v7wJeqk)
 - [YouTube Demo Video v1.3.0 - Connection Approval Mode](https://youtu.be/lIrLQUzu-OM)
 - [YouTube Demo Video](https://youtu.be/rHt5OeKh73o)
@@ -22,6 +23,9 @@ Watch a demonstration of this project in action:
 - **Connection Approval Mode** - Configurable approval mode with Manual Approve and Always Approve options
 - **Player Limits** - Configurable maximum player limit to prevent server overload
 - **Duplicate Name Prevention** - Server-side validation to prevent duplicate usernames
+- **Spawn Points & Randomization** - Configure spawn locations in the scene and optionally randomize which client gets which point
+- **Player State Synchronization** - `PlayerStateSync` script included to mirror custom player state across the network
+- **Prefab Enhancements** - Player prefab now has a status renderer and the name text prefab uses a mesh renderer for better visuals
 
 ## Prerequisites
 
