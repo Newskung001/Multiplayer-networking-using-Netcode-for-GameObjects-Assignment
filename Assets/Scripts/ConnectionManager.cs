@@ -18,6 +18,12 @@ public class ConnectionManager : MonoBehaviour
     [SerializeField] private Transform[] spawnPoints;
     [SerializeField] private bool useRandomSpawn = false;
 
+    [Header("Character Selection")] // inspector grouping
+    [SerializeField] private TMP_Dropdown characterDropdown; // dropdown to choose character
+
+    // list of prefab hashes corresponding to dropdown index; element 0 = default
+    [SerializeField] private List<uint> alternatePlayerPrefabHashes = new List<uint>();
+
     public enum ApprovalMode
     {
         AlwaysApprove,    // Always approve connections automatically
@@ -46,16 +52,24 @@ public class ConnectionManager : MonoBehaviour
         return isApproveConnection;
     }
     
-    private void SetConnectionData(string username)
+    /// <summary>
+    /// Store both username and chosen character id in the connection payload.
+    /// Format: "{username}|{characterId}" (pipe-separated).
+    /// </summary>
+    private void SetConnectionData(string username, int characterId)
     {
+        string payload = $"{username}|{characterId}";
         NetworkManager.Singleton.NetworkConfig.ConnectionData =
-            System.Text.Encoding.UTF8.GetBytes(username);
+            Encoding.UTF8.GetBytes(payload);
     }
 
     public void StartHostWithUsername()
     {
         string userName = usernameInput.GetComponent<TMP_InputField>().text;
-        SetConnectionData(userName);
+        int characterId = 0;
+        if (characterDropdown != null)
+            characterId = characterDropdown.value;
+        SetConnectionData(userName, characterId);
         // Host connection is always approved by Netcode (cannot reject itself),
         // but we still send payload for consistent logic and tracking.
         NetworkManager.Singleton.StartHost();
@@ -64,7 +78,10 @@ public class ConnectionManager : MonoBehaviour
     public void StartClientWithUsername()
     {
         string userName = usernameInput.GetComponent<TMP_InputField>().text;
-        SetConnectionData(userName);
+        int characterId = 0;
+        if (characterDropdown != null)
+            characterId = characterDropdown.value;
+        SetConnectionData(userName, characterId);
         NetworkManager.Singleton.StartClient();
     }
     
@@ -155,9 +172,24 @@ public class ConnectionManager : MonoBehaviour
     private void ApprovalCheck(NetworkManager.ConnectionApprovalRequest request,
         NetworkManager.ConnectionApprovalResponse response)
     {
-        string incomingName = DecodePayloadToString(request.Payload);
-        Debug.Log("incoming Name =  " + incomingName);
+        // parse username + character id from payload
+        if (!TryParseConnectionPayload(request.Payload, out string incomingName, out int characterId))
+        {
+            response.Approved = false;
+            response.Reason = "Invalid connection payload";
+            response.Pending = false;
+            return;
+        }
+        Debug.Log($"incoming Name = {incomingName}, charId = {characterId}");
         
+        // before any approval logic compute the prefab hash for the incoming character
+        uint? hash = GetPlayerPrefabHashFromCharacterId(characterId);
+        if (hash.HasValue)
+        {
+            response.PlayerPrefabHash = hash.Value;
+            Debug.Log($"assigning prefab hash {hash.Value} for character {characterId}");
+        }
+
         // Check if this is the Host
         // Host connection is always approved by Netcode (cannot reject itself)
         if (request.ClientNetworkId == NetworkManager.ServerClientId)
@@ -226,9 +258,7 @@ public class ConnectionManager : MonoBehaviour
     {
         response.Approved = true;
         response.CreatePlayerObject = true;
-        response.PlayerPrefabHash = null;
-        // Position should already be assigned by caller (ApprovalCheck).
-        // No action needed here since caller sets it before invoking.
+        // PlayerPrefabHash may have been set prior; leave it alone
         response.Rotation = Quaternion.identity;
         response.Reason = string.Empty;
         
@@ -253,6 +283,46 @@ public class ConnectionManager : MonoBehaviour
 
         int index = (int)(clientId % (ulong)spawnPoints.Length);
         return spawnPoints[index].position;
+    }
+
+    /// <summary>
+    /// Parse a connection payload of the form "username|characterId".
+    /// Returns false if format is invalid.
+    /// </summary>
+    private bool TryParseConnectionPayload(ArraySegment<byte> payload, out string username, out int characterId)
+    {
+        username = string.Empty;
+        characterId = 0;
+
+        string decoded = DecodePayloadToString(payload);
+        if (string.IsNullOrWhiteSpace(decoded))
+            return false;
+
+        string[] parts = decoded.Split('|');
+        if (parts.Length < 1)
+            return false;
+
+        username = parts[0].Trim();
+        if (parts.Length >= 2)
+        {
+            int.TryParse(parts[1], out characterId);
+        }
+        return true;
+    }
+
+    /// <summary>
+    /// Return a prefab hash based on the chosen character id.
+    /// The list should contain hashes in the same order as the dropdown options.
+    /// </summary>
+    private uint? GetPlayerPrefabHashFromCharacterId(int characterId)
+    {
+        if (alternatePlayerPrefabHashes == null || alternatePlayerPrefabHashes.Count == 0)
+            return null;
+
+        if (characterId < 0 || characterId >= alternatePlayerPrefabHashes.Count)
+            return alternatePlayerPrefabHashes[0];
+
+        return alternatePlayerPrefabHashes[characterId];
     }
 
     private void OnEnable()
