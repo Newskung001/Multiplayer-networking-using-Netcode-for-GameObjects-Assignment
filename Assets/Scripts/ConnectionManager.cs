@@ -9,6 +9,10 @@ using TMPro;
 
 public class ConnectionManager : MonoBehaviour
 {
+    // singleton access so other objects can read local username after spawn
+    public static ConnectionManager Instance { get; private set; }
+    public string LocalUsername { get; private set; } = "";
+
     [SerializeField] TMP_InputField usernameInput;
     [SerializeField] GameObject loginPanel;
     [SerializeField] GameObject leaveButton;
@@ -69,6 +73,10 @@ public class ConnectionManager : MonoBehaviour
         int characterId = 0;
         if (characterDropdown != null)
             characterId = characterDropdown.value;
+
+        // store locally for spawned player objects to read later
+        LocalUsername = userName;
+
         SetConnectionData(userName, characterId);
         // Host connection is always approved by Netcode (cannot reject itself),
         // but we still send payload for consistent logic and tracking.
@@ -81,10 +89,24 @@ public class ConnectionManager : MonoBehaviour
         int characterId = 0;
         if (characterDropdown != null)
             characterId = characterDropdown.value;
+
+        LocalUsername = userName;
         SetConnectionData(userName, characterId);
         NetworkManager.Singleton.StartClient();
     }
     
+    private void Awake()
+    {
+        // establish singleton instance (replace existing if necessary)
+        if (Instance != null && Instance != this)
+        {
+            Debug.LogWarning("Multiple ConnectionManager instances detected; keeping the first one.");
+            Destroy(this.gameObject);
+            return;
+        }
+        Instance = this;
+    }
+
     private void Start()
     {
         // Validate maxPlayers configuration to prevent invalid values
