@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v1.5.0] - 2026-03-11
+
+### Added
+- **Character Selection UI**: New UI screen allowing players to pick their character avatars prior to joining.
+- **Team Color Support**: Player prefab can now display team colors and updates `PlayerName` UI dynamically when team changes. Host state is distinguished in `PlayerStateSync`.
+
+### Changed
+- **Player Prefabs**: Added `worldOffset` and `TeamIndex` fields; enhanced `PlayerStateSync` to handle host-specific logic.
+
+### Git Commits
+- Commits: [787c4bb..30cc81f](https://github.com/Newskung001/Multiplayer-networking-using-Netcode-for-GameObjects-Assignment/compare/30cc81f...787c4bb) (`787c4bb`, `b0da738`, `30cc81f`)
+- Author: Newskung001
+- Dates: 2026-03-11
+
 ## [v1.4.0] - 2026-03-10
 
 ### Added
@@ -23,7 +37,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Git Commits
 - Commits: [9f4ed43..68e6d43](https://github.com/Newskung001/Multiplayer-networking-using-Netcode-for-GameObjects-Assignment/compare/68e6d43...9f4ed43) (`9f4ed43`, `a965ec5`, `e229b4c`, `c0e0079`, `eca9786`, `68e6d43`)
-- Authors: Various (primarily Newskung001)
+- Author: Newskung001
 - Dates: 2026-03-09 through 2026-03-10
 
 ---
