@@ -403,7 +403,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlayerStateSync
   ShowTopMostFoldoutHeaderGroup: 1
   namePrefab: {fileID: 8107780223145478097, guid: 79c00c6bffa36ac47a3cc9868b3afaf5, type: 3}
-  worldOffset: {x: 0, y: 1, z: 0}
+  worldOffset: {x: 0, y: 1.75, z: 0}
   statusRenderer: {fileID: 545423575505438056}
   PlayerName:
     UpdateTraits:
@@ -478,6 +478,11 @@ MonoBehaviour:
         byte0060: 0
         byte0061: 0
   IsSpecialStatus:
+    UpdateTraits:
+      MinSecondsBetweenUpdates: 0
+      MaxSecondsBetweenUpdates: 0
+    m_InternalValue: 0
+  TeamIndex:
     UpdateTraits:
       MinSecondsBetweenUpdates: 0
       MaxSecondsBetweenUpdates: 0

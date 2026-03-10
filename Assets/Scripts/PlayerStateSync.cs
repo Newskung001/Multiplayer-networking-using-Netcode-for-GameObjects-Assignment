@@ -136,19 +136,62 @@ public class PlayerStateSync : NetworkBehaviour
 
     private void OnTeamChanged(int oldValue, int newValue)
     {
-        // Example: change name label color by team index
+        // Example: change name label color by team index (with host override)
         if (nameLabel != null)
         {
-            nameLabel.color = newValue == 0 ? Color.white : Color.yellow;
+            bool isHostPlayer = OwnerClientId == NetworkManager.ServerClientId;
+            if (isHostPlayer)
+            {
+                // keep host text distinct (green) regardless of team
+                nameLabel.color = Color.green;
+            }
+            else
+            {
+                switch (newValue)
+                {
+                    case 1:
+                        nameLabel.color = Color.yellow;
+                        break;
+                    case 2:
+                        nameLabel.color = Color.magenta; // pinkish
+                        break;
+                    default:
+                        nameLabel.color = Color.white;
+                        break;
+                }
+            }
         }
+
+        // also refresh the displayed name text to include the team and host tag
+        UpdateNameUI(PlayerName.Value.ToString());
     }
 
     private void UpdateNameUI(string newName)
     {
-        if (nameLabel != null)
+        if (nameLabel == null) return;
+
+        string teamText = GetTeamName(TeamIndex.Value);
+        bool isHostPlayer = OwnerClientId == NetworkManager.ServerClientId;
+
+        // build the display text
+        string display = newName;
+        if (!string.IsNullOrEmpty(teamText))
+            display += $" [{teamText}]";
+        if (isHostPlayer)
+            display += " (Host)";
+
+        nameLabel.text = display;
+        //nameLabel.color = Color.red;
+    }
+
+    private string GetTeamName(int index)
+    {
+        // map the integer index to a human-readable team name
+        switch (index)
         {
-            nameLabel.text = newName;
-            //nameLabel.color = Color.red;
+            case 1: return "Yellow";
+            case 2: return "Pink";
+            default: return "Gray"; // index 0 or unknown
         }
     }
 
