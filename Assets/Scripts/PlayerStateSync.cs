@@ -57,6 +57,10 @@ public class PlayerStateSync : NetworkBehaviour
 
             // initialize team based on local character selection (could be mapped differently)
             TeamIndex.Value = ConnectionManager.Instance.LocalCharacterId;
+
+            // ensure color is applied immediately (OnTeamChanged may not fire if value stays at default)
+            ApplyTeamColor();
+            UpdateNameUI(PlayerName.Value.ToString());
         }
     }
 
@@ -136,32 +140,7 @@ public class PlayerStateSync : NetworkBehaviour
 
     private void OnTeamChanged(int oldValue, int newValue)
     {
-        // Example: change name label color by team index (with host override)
-        if (nameLabel != null)
-        {
-            bool isHostPlayer = OwnerClientId == NetworkManager.ServerClientId;
-            if (isHostPlayer)
-            {
-                // keep host text distinct (green) regardless of team
-                nameLabel.color = Color.green;
-            }
-            else
-            {
-                switch (newValue)
-                {
-                    case 1:
-                        nameLabel.color = Color.yellow;
-                        break;
-                    case 2:
-                        nameLabel.color = Color.magenta; // pinkish
-                        break;
-                    default:
-                        nameLabel.color = Color.white;
-                        break;
-                }
-            }
-        }
-
+        ApplyTeamColor();
         // also refresh the displayed name text to include the team and host tag
         UpdateNameUI(PlayerName.Value.ToString());
     }
@@ -192,6 +171,31 @@ public class PlayerStateSync : NetworkBehaviour
             case 1: return "Yellow";
             case 2: return "Pink";
             default: return "Gray"; // index 0 or unknown
+        }
+    }
+
+    private void ApplyTeamColor()
+    {
+        if (nameLabel == null) return;
+
+        bool isHostPlayer = OwnerClientId == NetworkManager.ServerClientId;
+        if (isHostPlayer)
+        {
+            nameLabel.color = Color.green;
+            return;
+        }
+
+        switch (TeamIndex.Value)
+        {
+            case 1:
+                nameLabel.color = Color.yellow;
+                break;
+            case 2:
+                nameLabel.color = Color.magenta; // pinkish
+                break;
+            default:
+                nameLabel.color = Color.white;
+                break;
         }
     }
 
