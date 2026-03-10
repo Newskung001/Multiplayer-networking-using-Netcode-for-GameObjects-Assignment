@@ -23,7 +23,10 @@ public class ConnectionManager : MonoBehaviour
     [SerializeField] private bool useRandomSpawn = false;
 
     [Header("Character Selection")] // inspector grouping
-    [SerializeField] private TMP_Dropdown characterDropdown; // dropdown to choose character
+    [SerializeField] private CharacterSelectUI characterSelectUI; // visual picker component
+
+    // store the locally chosen character index so spawned players can access it
+    public int LocalCharacterId { get; private set; } = 0;
 
     // list of prefab hashes corresponding to dropdown index; element 0 = default
     [SerializeField] private List<uint> alternatePlayerPrefabHashes = new List<uint>();
@@ -71,11 +74,12 @@ public class ConnectionManager : MonoBehaviour
     {
         string userName = usernameInput.GetComponent<TMP_InputField>().text;
         int characterId = 0;
-        if (characterDropdown != null)
-            characterId = characterDropdown.value;
+        if (characterSelectUI != null)
+            characterId = characterSelectUI.SelectedCharacterIndex;
 
         // store locally for spawned player objects to read later
         LocalUsername = userName;
+        LocalCharacterId = characterId;
 
         SetConnectionData(userName, characterId);
         // Host connection is always approved by Netcode (cannot reject itself),
@@ -87,10 +91,11 @@ public class ConnectionManager : MonoBehaviour
     {
         string userName = usernameInput.GetComponent<TMP_InputField>().text;
         int characterId = 0;
-        if (characterDropdown != null)
-            characterId = characterDropdown.value;
+        if (characterSelectUI != null)
+            characterId = characterSelectUI.SelectedCharacterIndex;
 
         LocalUsername = userName;
+        LocalCharacterId = characterId;
         SetConnectionData(userName, characterId);
         NetworkManager.Singleton.StartClient();
     }

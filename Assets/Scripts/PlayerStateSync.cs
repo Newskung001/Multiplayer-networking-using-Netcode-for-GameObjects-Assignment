@@ -27,12 +27,20 @@ public class PlayerStateSync : NetworkBehaviour
             NetworkVariableReadPermission.Everyone,
             NetworkVariableWritePermission.Owner);
 
+    // additional networked property to demonstrate a team or color index
+    public NetworkVariable<int> TeamIndex =
+        new NetworkVariable<int>(
+            0,
+            NetworkVariableReadPermission.Everyone,
+            NetworkVariableWritePermission.Owner);
+
     public override void OnNetworkSpawn()
     {
         mainCam = Camera.main;
 
         PlayerName.OnValueChanged += OnPlayerNameChanged;
         IsSpecialStatus.OnValueChanged += OnStatusChanged;
+        TeamIndex.OnValueChanged += OnTeamChanged;
 
         CreateNameLabel();
         UpdateNameUI(PlayerName.Value.ToString());
@@ -46,6 +54,9 @@ public class PlayerStateSync : NetworkBehaviour
             {
                 PlayerName.Value = localName;
             }
+
+            // initialize team based on local character selection (could be mapped differently)
+            TeamIndex.Value = ConnectionManager.Instance.LocalCharacterId;
         }
     }
 
@@ -53,6 +64,7 @@ public class PlayerStateSync : NetworkBehaviour
     {
         PlayerName.OnValueChanged -= OnPlayerNameChanged;
         IsSpecialStatus.OnValueChanged -= OnStatusChanged;
+        TeamIndex.OnValueChanged -= OnTeamChanged;
 
         DestroyNameLabel();
     }
@@ -120,6 +132,15 @@ public class PlayerStateSync : NetworkBehaviour
     private void OnStatusChanged(bool oldValue, bool newValue)
     {
         UpdateStatusVisual(newValue);
+    }
+
+    private void OnTeamChanged(int oldValue, int newValue)
+    {
+        // Example: change name label color by team index
+        if (nameLabel != null)
+        {
+            nameLabel.color = newValue == 0 ? Color.white : Color.yellow;
+        }
     }
 
     private void UpdateNameUI(string newName)
