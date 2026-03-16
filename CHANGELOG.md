@@ -5,6 +5,43 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v1.5.0] - 2026-03-11
+
+### Added
+- **Character Selection UI**: New UI screen allowing players to pick their character avatars prior to joining.
+- **Team Color Support**: Player prefab can now display team colors and updates `PlayerName` UI dynamically when team changes. Host state is distinguished in `PlayerStateSync`.
+
+### Changed
+- **Player Prefabs**: Added `worldOffset` and `TeamIndex` fields; enhanced `PlayerStateSync` to handle host-specific logic.
+
+### Git Commits
+- Commits: [787c4bb..30cc81f](https://github.com/Newskung001/Multiplayer-networking-using-Netcode-for-GameObjects-Assignment/compare/30cc81f...787c4bb) (`787c4bb`, `b0da738`, `30cc81f`)
+- Author: Newskung001
+- Dates: 2026-03-11
+
+## [v1.4.0] - 2026-03-10
+
+### Added
+- **Spawn Points**: Configurable spawn locations with optional random selection for clients
+- **Player State Sync**: `PlayerStateSync` script added to synchronize additional player data across the network
+- **Prefab Enhancements**: Player prefab now includes a `statusRenderer`; the PlayerName text prefab gained a `MeshRenderer` component
+
+### Fixed
+- **Prefab Hash & Approval**: Compute and assign prefab hash before connection approval checks, with added debug logging; corrected scene hash in `SampleScene` to avoid mismatches
+
+### Changed
+- **Dependencies**: Updated Unity package dependencies to the latest compatible versions
+
+### Documentation
+- **Changelog Links**: Added Git commit references to changelog entries for easier navigation
+
+### Git Commits
+- Commits: [9f4ed43..68e6d43](https://github.com/Newskung001/Multiplayer-networking-using-Netcode-for-GameObjects-Assignment/compare/68e6d43...9f4ed43) (`9f4ed43`, `a965ec5`, `e229b4c`, `c0e0079`, `eca9786`, `68e6d43`)
+- Author: Newskung001
+- Dates: 2026-03-09 through 2026-03-10
+
+---
+
 ## [v1.3.1] - 2026-02-28
 
 ### Added

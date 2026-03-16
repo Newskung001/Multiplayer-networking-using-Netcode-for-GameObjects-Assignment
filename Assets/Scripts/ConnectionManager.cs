@@ -9,6 +9,10 @@ using TMPro;
 
 public class ConnectionManager : MonoBehaviour
 {
+    // singleton access so other objects can read local username after spawn
+    public static ConnectionManager Instance { get; private set; }
+    public string LocalUsername { get; private set; } = "";
+
     [SerializeField] TMP_InputField usernameInput;
     [SerializeField] GameObject loginPanel;
     [SerializeField] GameObject leaveButton;
@@ -19,7 +23,10 @@ public class ConnectionManager : MonoBehaviour
     [SerializeField] private bool useRandomSpawn = false;
 
     [Header("Character Selection")] // inspector grouping
-    [SerializeField] private TMP_Dropdown characterDropdown; // dropdown to choose character
+    [SerializeField] private CharacterSelectUI characterSelectUI; // visual picker component
+
+    // store the locally chosen character index so spawned players can access it
+    public int LocalCharacterId { get; private set; } = 0;
 
     // list of prefab hashes corresponding to dropdown index; element 0 = default
     [SerializeField] private List<uint> alternatePlayerPrefabHashes = new List<uint>();
@@ -67,8 +74,13 @@ public class ConnectionManager : MonoBehaviour
     {
         string userName = usernameInput.GetComponent<TMP_InputField>().text;
         int characterId = 0;
-        if (characterDropdown != null)
-            characterId = characterDropdown.value;
+        if (characterSelectUI != null)
+            characterId = characterSelectUI.SelectedCharacterIndex;
+
+        // store locally for spawned player objects to read later
+        LocalUsername = userName;
+        LocalCharacterId = characterId;
+
         SetConnectionData(userName, characterId);
         // Host connection is always approved by Netcode (cannot reject itself),
         // but we still send payload for consistent logic and tracking.
@@ -79,12 +91,27 @@ public class ConnectionManager : MonoBehaviour
     {
         string userName = usernameInput.GetComponent<TMP_InputField>().text;
         int characterId = 0;
-        if (characterDropdown != null)
-            characterId = characterDropdown.value;
+        if (characterSelectUI != null)
+            characterId = characterSelectUI.SelectedCharacterIndex;
+
+        LocalUsername = userName;
+        LocalCharacterId = characterId;
         SetConnectionData(userName, characterId);
         NetworkManager.Singleton.StartClient();
     }
     
+    private void Awake()
+    {
+        // establish singleton instance (replace existing if necessary)
+        if (Instance != null && Instance != this)
+        {
+            Debug.LogWarning("Multiple ConnectionManager instances detected; keeping the first one.");
+            Destroy(this.gameObject);
+            return;
+        }
+        Instance = this;
+    }
+
     private void Start()
     {
         // Validate maxPlayers configuration to prevent invalid values
@@ -182,6 +209,14 @@ public class ConnectionManager : MonoBehaviour
         }
         Debug.Log($"incoming Name = {incomingName}, charId = {characterId}");
         
+        // before any approval logic compute the prefab hash for the incoming character
+        uint? hash = GetPlayerPrefabHashFromCharacterId(characterId);
+        if (hash.HasValue)
+        {
+            response.PlayerPrefabHash = hash.Value;
+            Debug.Log($"assigning prefab hash {hash.Value} for character {characterId}");
+        }
+
         // Check if this is the Host
         // Host connection is always approved by Netcode (cannot reject itself)
         if (request.ClientNetworkId == NetworkManager.ServerClientId)
@@ -243,10 +278,6 @@ public class ConnectionManager : MonoBehaviour
         
         // 4. If passed all checks then approve
         response.Position = GetSpawnPosition(request.ClientNetworkId);
-        // assign prefab hash based on character choice
-        uint? hash = GetPlayerPrefabHashFromCharacterId(characterId);
-        if (hash.HasValue)
-            response.PlayerPrefabHash = hash.Value;
         SetupApprovedResponse(response, request.ClientNetworkId, incomingName);
     }
     
