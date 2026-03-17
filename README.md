@@ -9,6 +9,7 @@ This educational project teaches the fundamentals of implementing player movemen
 ## 📺 Demo Video
 
 Watch a demonstration of this project in action:
+- [YouTube Demo Video v1.6.0 - Item Usage, Respawn & Warnings](https://youtu.be/ayDatHFu2ls)
 - [YouTube Demo Video v1.5.0 - Character Selection & Team Colors](https://youtu.be/q5bilQQiywA) 
 - [YouTube Demo Video v1.4.0 - Spawn Points & Prefab Improvements](https://youtu.be/SjlMnAtwjQw)
 - [YouTube Demo Video v1.3.1 - Player Limits & Duplicate Name Check](https://youtu.be/h2C8v7wJeqk)
@@ -29,6 +30,7 @@ Watch a demonstration of this project in action:
 - **Prefab Enhancements** - Player prefab now has a status renderer and the name text prefab uses a mesh renderer for better visuals
 - **Character Selection UI** - Players can choose from multiple avatars before joining the game
 - **Team Color & Naming UI Improvements** - Team index is now applied to player prefab visuals and `PlayerName` updates when team colors change; host-specific state handling added to `PlayerStateSync`
+- **Item Usage & Respawn** - Players can use items via RPC calls, with usage count UI updates, reset functionality, and a warning UI when uses are depleted.
 
 ## Prerequisites
 

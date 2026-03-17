@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v1.6.0] - 2026-03-17
+
+### Added
+- **Player Respawn & RPC**: Added respawn flow and RPC functionality for player actions and item interactions.
+- **Item Usage System**: Implemented item use + reset mechanics in `PlayerRpcDemo` with UI updates for remaining uses.
+- **Warning UI for Item Usage**: Added a "no uses remaining" warning UI and flashing effect when an item is depleted.
+
+### Changed
+- **Dependencies & Settings**: Updated project settings and Unity package dependencies for compatibility.
+
+### Git Commits
+- Commits: [cd7798d..a15e30b](https://github.com/Newskung001/Multiplayer-networking-using-Netcode-for-GameObjects-Assignment/compare/a15e30b...cd7798d) (`cd7798d`, `4c07b7f`, `2798630`, `0ca98e8`, `71ce495`, `a15e30b`)
+- Author: Newskung001
+- Dates: 2026-03-17
+
 ## [v1.5.0] - 2026-03-11
 
 ### Added
