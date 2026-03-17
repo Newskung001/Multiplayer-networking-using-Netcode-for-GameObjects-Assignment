@@ -15,6 +15,8 @@ public class PlayerStateSync : NetworkBehaviour
     private TMP_Text nameLabel;
     private Camera mainCam;
 
+    private PlayerRpcDemo rpcDemo;
+
     public NetworkVariable<FixedString64Bytes> PlayerName =
         new NetworkVariable<FixedString64Bytes>(
             default,
@@ -46,6 +48,12 @@ public class PlayerStateSync : NetworkBehaviour
         UpdateNameUI(PlayerName.Value.ToString());
         UpdateStatusVisual(IsSpecialStatus.Value);
 
+        rpcDemo = GetComponent<PlayerRpcDemo>();
+        if (rpcDemo != null)
+        {
+            rpcDemo.ItemUseCount.OnValueChanged += OnItemUseCountChanged;
+        }
+
         if (IsOwner && ConnectionManager.Instance != null)
         {
             string localName = ConnectionManager.Instance.LocalUsername;
@@ -69,6 +77,11 @@ public class PlayerStateSync : NetworkBehaviour
         PlayerName.OnValueChanged -= OnPlayerNameChanged;
         IsSpecialStatus.OnValueChanged -= OnStatusChanged;
         TeamIndex.OnValueChanged -= OnTeamChanged;
+
+        if (rpcDemo != null)
+        {
+            rpcDemo.ItemUseCount.OnValueChanged -= OnItemUseCountChanged;
+        }
 
         DestroyNameLabel();
     }
@@ -145,6 +158,12 @@ public class PlayerStateSync : NetworkBehaviour
         UpdateNameUI(PlayerName.Value.ToString());
     }
 
+    private void OnItemUseCountChanged(int oldValue, int newValue)
+    {
+        // Update the UI label when the synchronized item use count changes
+        UpdateNameUI(PlayerName.Value.ToString());
+    }
+
     private void UpdateNameUI(string newName)
     {
         if (nameLabel == null) return;
@@ -158,6 +177,12 @@ public class PlayerStateSync : NetworkBehaviour
             display += $" [{teamText}]";
         if (isHostPlayer)
             display += " (Host)";
+
+        if (rpcDemo != null)
+        {
+            int uses = rpcDemo.ItemUseCount.Value;
+            display += $" - Uses: {uses}";
+        }
 
         nameLabel.text = display;
         //nameLabel.color = Color.red;

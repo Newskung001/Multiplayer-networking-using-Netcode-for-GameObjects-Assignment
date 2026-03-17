@@ -485,6 +485,22 @@ MonoBehaviour:
     m_ActionName: 'Player/TestRpc[/Keyboard/t]'
   - m_PersistentCalls:
       m_Calls:
+      - m_Target: {fileID: 8718732893496957569}
+        m_TargetAssemblyTypeName: PlayerRpcDemo, Assembly-CSharp
+        m_MethodName: UseItem
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_ActionId: 852140f2-7766-474d-8707-702459ba45f3
+    m_ActionName: 'Player/Interact[/Keyboard/e]'
+  - m_PersistentCalls:
+      m_Calls:
       - m_Target: {fileID: 8515017673831886938}
         m_TargetAssemblyTypeName: PlayerRespawnDemo, Assembly-CSharp
         m_MethodName: RequestRespawn

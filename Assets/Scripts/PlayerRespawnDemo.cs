@@ -35,7 +35,14 @@ public class PlayerRespawnDemo : NetworkBehaviour
             $"[Server] Respawn request from clientId: {senderId}, " +
             $"object owner={OwnerClientId}, object={gameObject.name}"
         );
-        
+
+        // Reset item uses on respawn (server authoritative)
+        PlayerRpcDemo rpcDemo = GetComponent<PlayerRpcDemo>();
+        if (rpcDemo != null)
+        {
+            rpcDemo.ResetItemUses();
+        }
+
         ClientRpcParams targetParams = new ClientRpcParams
         {
             Send = new ClientRpcSendParams
