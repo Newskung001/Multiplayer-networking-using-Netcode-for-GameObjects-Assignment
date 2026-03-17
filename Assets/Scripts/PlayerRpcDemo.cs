@@ -5,6 +5,9 @@ using UnityEngine.InputSystem;
 public class PlayerRpcDemo : NetworkBehaviour
 {
     private const int DefaultItemUses = 3;
+    private const float UseItemDebounceSeconds = 0.1f;
+
+    private float lastUseItemTime = -Mathf.Infinity;
 
     private NetworkVariable<int> interactCount = new NetworkVariable<int>(0);
 
@@ -60,6 +63,7 @@ public class PlayerRpcDemo : NetworkBehaviour
         if (!context.performed) return;
 
         Debug.Log($"[Local] UseItem pressed by client: {NetworkManager.Singleton.LocalClientId}");
+        lastUseItemTime = Time.unscaledTime;
         UseItemServerRpc();
     }
 
@@ -68,9 +72,14 @@ public class PlayerRpcDemo : NetworkBehaviour
         // Fallback input check for cases where the PlayerInput binding may not be invoked (e.g. prefab binding mismatch)
         if (!IsOwner) return;
 
+        // Prevent the fallback check from firing immediately after the InputAction callback
+        // (which may call UseItemServerRpc via the binding) so we avoid double-using.
+        if (Time.unscaledTime - lastUseItemTime < UseItemDebounceSeconds) return;
+
         var keyboard = UnityEngine.InputSystem.Keyboard.current;
         if (keyboard != null && keyboard.eKey.wasPressedThisFrame)
         {
+            lastUseItemTime = Time.unscaledTime;
             UseItemServerRpc();
         }
     }

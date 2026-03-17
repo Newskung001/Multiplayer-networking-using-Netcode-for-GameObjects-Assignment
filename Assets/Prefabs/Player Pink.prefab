@@ -264,6 +264,7 @@ MonoBehaviour:
   namePrefab: {fileID: 8107780223145478097, guid: 79c00c6bffa36ac47a3cc9868b3afaf5, type: 3}
   worldOffset: {x: 0, y: 1.75, z: 0}
   statusRenderer: {fileID: 8356634551860080014}
+  noUsesWarningPrefab: {fileID: 1006212139068060528, guid: 955826ad3aa0e9444a48eb072ced8216, type: 3}
   PlayerName:
     UpdateTraits:
       MinSecondsBetweenUpdates: 0
