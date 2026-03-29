@@ -7,6 +7,10 @@ public class Bomb : NetworkBehaviour
     [SerializeField]
     private float lifetime = 3f;
 
+    [Header("Explosion")]
+    [SerializeField]
+    private GameObject explosionPrefab;
+
     private float timer;
     private int lastLoggedSecond = -1;
     private ulong requestedByClientId = ulong.MaxValue;
@@ -56,6 +60,32 @@ public class Bomb : NetworkBehaviour
 
         if (timer <= 0f)
         {
+            if (explosionPrefab != null)
+            {
+                GameObject explosionInstance = Instantiate(
+                    explosionPrefab, transform.position, Quaternion.identity
+                );
+                NetworkObject explosionNetworkObject = explosionInstance.GetComponent<NetworkObject>();
+                if (explosionNetworkObject != null)
+                {
+                    explosionNetworkObject.Spawn();
+                    Debug.Log(
+                        $"[Server] Explosion spawned | FromBombId: {NetworkObjectId} "
+                            + $"| ExplostionNetworkObjectId: {explosionNetworkObject.NetworkObjectId} "
+                            + $"| Position: {transform.position}"
+                    );
+                }
+                else
+                {
+                    Debug.LogError("Explosion prefab is missing NetworkObject.");
+                    Destroy(explosionInstance);
+                }
+            }
+            else
+            {
+                Debug.LogWarning("Explosion prefab is not assigned on Bomb.");
+            }
+
             Debug.Log(
                 $"[Server] Bomb despawning | NetworkObjectId: {NetworkObjectId} "
                     + $"| RequestedByClientId: {requestedByClientId} "
