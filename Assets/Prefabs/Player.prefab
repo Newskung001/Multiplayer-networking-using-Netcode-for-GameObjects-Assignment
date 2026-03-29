@@ -83,6 +83,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 41f081d5c6d286c47a33bed3f84de79a, type: 3}
       insertIndex: -1
       addedObject: {fileID: 8515017673831886938}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 41f081d5c6d286c47a33bed3f84de79a, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: -5456393252680067301}
   m_SourcePrefab: {fileID: 100100000, guid: 41f081d5c6d286c47a33bed3f84de79a, type: 3}
 --- !u!1 &2592790725386775928 stripped
 GameObject:
@@ -248,7 +251,6 @@ MonoBehaviour:
   namePrefab: {fileID: 8107780223145478097, guid: 79c00c6bffa36ac47a3cc9868b3afaf5, type: 3}
   worldOffset: {x: 0, y: 1.75, z: 0}
   statusRenderer: {fileID: 0}
-  noUsesWarningPrefab: {fileID: 1006212139068060528, guid: 955826ad3aa0e9444a48eb072ced8216, type: 3}
   PlayerName:
     UpdateTraits:
       MinSecondsBetweenUpdates: 0
@@ -516,6 +518,10 @@ MonoBehaviour:
         m_CallState: 2
     m_ActionId: 9988f462-fe7c-4dfe-bcdd-880af700e1e0
     m_ActionName: 'Player/Respawn[/Keyboard/r]'
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: f549037f-3e70-46b5-91da-555edc14e2dc
+    m_ActionName: 'Player/PlaceBomb[/Keyboard/b]'
   m_NeverAutoSwitchControlSchemes: 0
   m_DefaultControlScheme: 
   m_DefaultActionMap: Player
@@ -547,3 +553,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerRespawnDemo
   ShowTopMostFoldoutHeaderGroup: 1
+--- !u!114 &-5456393252680067301
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2592790725386775928}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7d80812c89d44d648875374a03ff831f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerBombSpawner
+  ShowTopMostFoldoutHeaderGroup: 1
+  bombPrefab: {fileID: 6290562169945790246, guid: 45f20316c67ba084e8b32015e8c5b16e, type: 3}
+  bombSpawnOffset: 1.5

@@ -99,6 +99,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 41f081d5c6d286c47a33bed3f84de79a, type: 3}
       insertIndex: -1
       addedObject: {fileID: 4353147061929348305}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 41f081d5c6d286c47a33bed3f84de79a, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 3860518213031324759}
   m_SourcePrefab: {fileID: 100100000, guid: 41f081d5c6d286c47a33bed3f84de79a, type: 3}
 --- !u!137 &545423575505438056 stripped
 SkinnedMeshRenderer:
@@ -269,7 +272,6 @@ MonoBehaviour:
   namePrefab: {fileID: 8107780223145478097, guid: 79c00c6bffa36ac47a3cc9868b3afaf5, type: 3}
   worldOffset: {x: 0, y: 1.75, z: 0}
   statusRenderer: {fileID: 545423575505438056}
-  noUsesWarningPrefab: {fileID: 1006212139068060528, guid: 955826ad3aa0e9444a48eb072ced8216, type: 3}
   PlayerName:
     UpdateTraits:
       MinSecondsBetweenUpdates: 0
@@ -564,3 +566,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerRespawnDemo
   ShowTopMostFoldoutHeaderGroup: 1
+--- !u!114 &3860518213031324759
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2301104577641792456}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7d80812c89d44d648875374a03ff831f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerBombSpawner
+  ShowTopMostFoldoutHeaderGroup: 1
+  bombPrefab: {fileID: 6290562169945790246, guid: 45f20316c67ba084e8b32015e8c5b16e, type: 3}
+  bombSpawnOffset: 1.5
