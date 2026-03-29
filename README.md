@@ -8,8 +8,8 @@ This educational project teaches the fundamentals of implementing player movemen
 
 ## 📺 Demo Video
 
-Watch a demonstration of this project in action:
-- [YouTube Demo Video v1.7.0 - Bomb System & Advanced Gameplay Rules](https://youtu.be/Gnu01MEilVg)
+Watch a demonstration of this project in action. Note that videos may or may not reflect all features the game currently has:
+- [YouTube Demo Video v1.7.0 - Bomb System & Advanced Gameplay Rules](https://youtu.be/S_bNccx_Vls)
 - [YouTube Demo Video v1.6.0 - Item Usage, Respawn & Warnings](https://youtu.be/ayDatHFu2ls)
 - [YouTube Demo Video v1.5.0 - Character Selection & Team Colors](https://youtu.be/q5bilQQiywA) 
 - [YouTube Demo Video v1.4.0 - Spawn Points & Prefab Improvements](https://youtu.be/SjlMnAtwjQw)
