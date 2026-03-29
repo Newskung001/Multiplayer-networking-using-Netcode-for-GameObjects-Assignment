@@ -5,6 +5,31 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v1.7.0] - 2026-03-29
+
+### Added
+- **Bomb System**: Introduced a fully networked bomb mechanic with `PlayerBombSpawner`, `Bomb`, and `ExplosionEffect` scripts. Players can place bombs using the new `PlaceBomb` input action; the server handles spawn, countdown, explosion spawn, and despawn.
+- **Explosion Prefab & Effect**: An `ExplosionEffect` NetworkObject is spawned at detonation and auto-despawns after its lifetime expires.
+- **Explosion Sound**: `ExplosionEffect` now plays a 3D audio clip via `AudioSource.PlayClipAtPoint` on all clients when the explosion spawns. Sound credit: *Explosion Sound* by [David Dumais](https://pixabay.com/users/daviddumaisaudio-41768500/?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=190266) from [Pixabay](https://pixabay.com/sound-effects//?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=190266).
+
+### Optional Extensions (Advanced Gameplay Rules)
+- **Bomb Placement Cooldown** *(Feature 1)*: Server-side per-player cooldown (`bombCooldown`, default 2s) prevents bomb spamming. Rejected requests notify the owner client via `ClientRpc` with the remaining cooldown time.
+- **Active Bomb Limit** *(Feature 2)*: Configurable maximum simultaneous bombs per player (`maxActiveBombs`, default 3). The server tracks live bomb references and rejects placements when the limit is reached.
+- **`SpawnWithOwnership()` Comparison** *(Feature 3)*: Added `useSpawnWithOwnership` toggle on `PlayerBombSpawner`. When enabled, bombs use `SpawnWithOwnership(senderClientId)` so `OwnerClientId` matches the requesting player; a log line shows `OwnerMatchesRequester` for direct comparison with the default `Spawn()` (server-owned) behaviour.
+- **Networked Bomb Requester ID** *(Feature 5)*: Added `NetworkVariable<ulong> NetworkedRequesterId` on `Bomb` so all clients know which player placed each bomb. `OnNetworkSpawn` logs are now emitted on every client, not just the server.
+- **Collision-Triggered Detonation** *(Feature 6)*: `Bomb` supports a `triggerByCollision` mode that skips the timer and detonates on `OnTriggerEnter` with any other `NetworkObject`. An `armDelay` (default 0.5s) prevents instant self-detonation on placement.
+
+### Changed
+- **`Bomb.cs`**: Extracted shared explosion logic into a `Detonate()` helper method used by both timer and collision paths. `OnNetworkSpawn` logs are now visible to all clients.
+- **`ExplosionEffect.cs`**: Removed `IsServer` guard from `OnNetworkSpawn` for the audio path so all clients play the sound independently.
+
+### Git Commits
+- Commits: [8550f5c..ece0915](https://github.com/Newskung001/Multiplayer-networking-using-Netcode-for-GameObjects-Assignment/compare/8550f5c30994ff31dba13f33bc326f13e90f7e75...ece0915963f5b630a5310051daf8698614b8c42d) (`f4c54c1`, `8ba4de4`, `dfbbae1`, `ece0915`)
+- Author: Newskung001
+- Date: 2026-03-29
+
+---
+
 ## [v1.6.0] - 2026-03-17
 
 ### Added

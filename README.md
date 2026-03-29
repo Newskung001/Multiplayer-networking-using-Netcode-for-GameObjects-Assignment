@@ -9,6 +9,7 @@ This educational project teaches the fundamentals of implementing player movemen
 ## 📺 Demo Video
 
 Watch a demonstration of this project in action:
+- [YouTube Demo Video v1.7.0 - Bomb System & Advanced Gameplay Rules](https://youtu.be/Gnu01MEilVg)
 - [YouTube Demo Video v1.6.0 - Item Usage, Respawn & Warnings](https://youtu.be/ayDatHFu2ls)
 - [YouTube Demo Video v1.5.0 - Character Selection & Team Colors](https://youtu.be/q5bilQQiywA) 
 - [YouTube Demo Video v1.4.0 - Spawn Points & Prefab Improvements](https://youtu.be/SjlMnAtwjQw)
@@ -31,6 +32,12 @@ Watch a demonstration of this project in action:
 - **Character Selection UI** - Players can choose from multiple avatars before joining the game
 - **Team Color & Naming UI Improvements** - Team index is now applied to player prefab visuals and `PlayerName` updates when team colors change; host-specific state handling added to `PlayerStateSync`
 - **Item Usage & Respawn** - Players can use items via RPC calls, with usage count UI updates, reset functionality, and a warning UI when uses are depleted.
+- **Networked Bomb System** - Players can place bombs that countdown and explode, spawning an `ExplosionEffect` on all clients with a 3D sound effect.
+- **Bomb Placement Cooldown** - Server-side cooldown prevents bomb spamming; rejected clients are notified via `ClientRpc`.
+- **Active Bomb Limit** - Configurable cap on simultaneous live bombs per player, tracked server-side with `NetworkObjectReference`.
+- **`SpawnWithOwnership()` Comparison** - Inspector toggle to switch between `Spawn()` (server-owned) and `SpawnWithOwnership()` (player-owned) to explore ownership behaviour differences.
+- **Networked Bomb Requester ID** - `NetworkVariable<ulong>` on `Bomb` exposes the placing player's ID to all clients.
+- **Collision-Triggered Bombs** - Optional bomb mode that detonates on contact with a networked object instead of a timer, with configurable arm delay.
 
 ## Prerequisites
 
@@ -53,18 +60,30 @@ Watch a demonstration of this project in action:
 |--------|-----|
 | Move | WASD or Arrow Keys |
 | Jump | Space |
+| Place Bomb | Configured via Input Action Asset (`PlaceBomb`) |
 
 ## Project Structure
 
 ```
 Assets/
 ├── Scripts/
-│   ├── MainPlayerScript.cs    # Player movement, jump, and input handling
-│   └── MainGameManagerScript.cs # Network connection management
+│   ├── MainPlayerScript.cs      # Player movement, jump, and input handling
+│   ├── MainGameManagerScript.cs # Network connection management
+│   ├── PlayerBombSpawner.cs     # Input → ServerRpc bomb spawn with cooldown & limit
+│   ├── Bomb.cs                  # Server countdown/collision detonation & NetworkVariable requester ID
+│   ├── ExplosionEffect.cs       # Timed NetworkObject despawn + 3D explosion audio
+│   ├── PlayerStateSync.cs       # Player name, team color, and status synchronization
+│   ├── PlayerRpcDemo.cs         # Item use RPCs and usage count NetworkVariable
+│   ├── ConnectionManager.cs     # Connection approval, player limits, username validation
+│   └── CharacterSelectUI.cs     # Pre-join character/avatar selection UI
 ├── Prefabs/
-│   └── Player.prefab          # Networked player prefab with NetworkObject & NetworkTransform
+│   ├── Player.prefab            # Networked player prefab with NetworkObject & NetworkTransform
+│   ├── Bomb.prefab              # Networked bomb with Bomb script and collider
+│   └── Explosion.prefab         # Networked explosion effect with ExplosionEffect script
+├── Audio/
+│   └── explosion.wav            # Explosion sound effect (see Credits)
 └── Scenes/
-    └── SampleScene.unity      # Main game scene
+    └── SampleScene.unity        # Main game scene
 ```
 
 ## Learning Resources
@@ -74,6 +93,10 @@ This project is part of a Unity learning curriculum focusing on:
 - Netcode for GameObjects basics
 - Network behaviour and ownership
 - Physics-based character controllers
+
+## Credits
+
+- **Explosion Sound** — Sound Effect by [David Dumais](https://pixabay.com/users/daviddumaisaudio-41768500/?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=190266) from [Pixabay](https://pixabay.com/sound-effects//?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=190266)
 
 ## Changelog
 
