@@ -225,7 +225,7 @@ ParticleSystem:
       serializedVersion: 2
       minMaxState: 0
       minColor: {r: 1, g: 1, b: 1, a: 1}
-      maxColor: {r: 1, g: 1, b: 1, a: 1}
+      maxColor: {r: 1, g: 0, b: 0, a: 1}
       maxGradient:
         serializedVersion: 2
         key0: {r: 1, g: 1, b: 1, a: 1}
@@ -4876,4 +4876,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ExplosionEffect
   ShowTopMostFoldoutHeaderGroup: 1
-  lifetime: 0.8
+  lifetime: 2
+  explosionSound: {fileID: 8300000, guid: 1cceea959915b67408db2e6052510f6a, type: 3}
+  soundVolume: 1
