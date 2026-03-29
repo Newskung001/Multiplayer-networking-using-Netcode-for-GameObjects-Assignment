@@ -34,4 +34,35 @@ public class Bomb : NetworkBehaviour
                 + $"| Position: {transform.position}"
         );
     }
+
+    private void Update()
+    {
+        if (!IsServer)
+            return;
+
+        timer -= Time.deltaTime;
+
+        int currentSecond = Mathf.CeilToInt(timer);
+        if (currentSecond != lastLoggedSecond && currentSecond >= 0)
+        {
+            lastLoggedSecond = currentSecond;
+            Debug.Log(
+                $"[Server] Bomb timer | NetworkObjectId: {NetworkObjectId} "
+                    + $"| RequestedByClientId: {requestedByClientId} "
+                    + $"| OwnerClientId: {OwnerClientId} "
+                    + $"| Remaining: {currentSecond}s"
+            );
+        }
+
+        if (timer <= 0f)
+        {
+            Debug.Log(
+                $"[Server] Bomb despawning | NetworkObjectId: {NetworkObjectId} "
+                    + $"| RequestedByClientId: {requestedByClientId} "
+                    + $"| OwnerClientId: {OwnerClientId} "
+                    + $"| Final Position: {transform.position}"
+            );
+            NetworkObject.Despawn();
+        }
+    }
 }

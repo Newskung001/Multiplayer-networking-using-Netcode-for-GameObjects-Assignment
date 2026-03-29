@@ -5,8 +5,11 @@ using UnityEngine.InputSystem;
 public class PlayerBombSpawner : NetworkBehaviour
 {
     [Header("Bomb Spawn")]
-    [SerializeField] private GameObject bombPrefab;
-    [SerializeField] private float bombSpawnOffset = 1.5f;
+    [SerializeField]
+    private GameObject bombPrefab;
+
+    [SerializeField]
+    private float bombSpawnOffset = 1.5f;
 
     private PlayerInput playerInput;
     private InputAction placeBombAction;
@@ -18,7 +21,8 @@ public class PlayerBombSpawner : NetworkBehaviour
 
     public override void OnNetworkSpawn()
     {
-        if (!IsOwner) return;
+        if (!IsOwner)
+            return;
         placeBombAction = playerInput.actions["PlaceBomb"];
         if (placeBombAction != null)
         {
@@ -32,7 +36,8 @@ public class PlayerBombSpawner : NetworkBehaviour
 
     public override void OnNetworkDespawn()
     {
-        if (!IsOwner) return;
+        if (!IsOwner)
+            return;
         if (placeBombAction != null)
         {
             placeBombAction.performed -= OnPlaceBombPerformed;
@@ -59,10 +64,10 @@ public class PlayerBombSpawner : NetworkBehaviour
     {
         ulong senderClientId = rpcParams.Receive.SenderClientId;
         Debug.Log(
-            $"[Server] PlaceBombServerRpc received " +
-            $"| SenderClientId: {senderClientId} " +
-            $"| PlayerObjectOwnerClientId: {OwnerClientId} " +
-            $"| PlayerObjectId: {NetworkObjectId}"
+            $"[Server] PlaceBombServerRpc received "
+                + $"| SenderClientId: {senderClientId} "
+                + $"| PlayerObjectOwnerClientId: {OwnerClientId} "
+                + $"| PlayerObjectId: {NetworkObjectId}"
         );
 
         if (bombPrefab == null)
@@ -73,11 +78,7 @@ public class PlayerBombSpawner : NetworkBehaviour
 
         Vector3 spawnPosition = GetBombSpawnPosition();
 
-        GameObject bombInstance = Instantiate(
-            bombPrefab,
-            spawnPosition,
-            Quaternion.identity
-        );
+        GameObject bombInstance = Instantiate(bombPrefab, spawnPosition, Quaternion.identity);
 
         NetworkObject bombNetworkObject = bombInstance.GetComponent<NetworkObject>();
 
@@ -95,16 +96,18 @@ public class PlayerBombSpawner : NetworkBehaviour
         }
         else
         {
-            Debug.LogWarning("Bomb component not found on bomb prefab. RequestedByClientId will not be stored.");
+            Debug.LogWarning(
+                "Bomb component not found on bomb prefab. RequestedByClientId will not be stored."
+            );
         }
 
         bombNetworkObject.Spawn();
 
         Debug.Log(
-            $"[Server] Bomb spawned from request | SenderClientId: {senderClientId} " +
-            $"| BombNetworkObjectId: {bombNetworkObject.NetworkObjectId} " +
-            $"| BombOwnerClientId: {bombNetworkObject.OwnerClientId} " +
-            $"| SpawnPosition: {spawnPosition}"
+            $"[Server] Bomb spawned from request | SenderClientId: {senderClientId} "
+                + $"| BombNetworkObjectId: {bombNetworkObject.NetworkObjectId} "
+                + $"| BombOwnerClientId: {bombNetworkObject.OwnerClientId} "
+                + $"| SpawnPosition: {spawnPosition}"
         );
     }
 }
