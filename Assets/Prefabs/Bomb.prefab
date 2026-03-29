@@ -153,4 +153,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Bomb
   ShowTopMostFoldoutHeaderGroup: 1
   lifetime: 3
-  explosionPrefab: {fileID: 6290562169945790246}
+  explosionPrefab: {fileID: 7614538334637982029, guid: 9691508bf7530754ba3631f7c75acb2f, type: 3}
