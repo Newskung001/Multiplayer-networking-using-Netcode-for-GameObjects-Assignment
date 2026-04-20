@@ -38,6 +38,8 @@ public class MatchManager : NetworkBehaviour
     private int requiredPlayerCount = 2;
 
     private float checkTimer;
+    private readonly System.Collections.Generic.HashSet<ulong> rematchVotes = 
+        new System.Collections.Generic.HashSet<ulong>();
 
     private void Awake()
     {
@@ -178,6 +180,32 @@ public class MatchManager : NetworkBehaviour
         IsMatchOver.Value = false;
         WinnerName.Value = "";
         MatchStatusMessage.Value = statusMessage;
+        
+        if (IsServer)
+        {
+            rematchVotes.Clear();
+        }
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    public void VoteRematchServerRpc(ServerRpcParams rpcParams = default)
+    {
+        if (!IsMatchOver.Value)
+            return;
+
+        ulong clientId = rpcParams.Receive.SenderClientId;
+        if (rematchVotes.Add(clientId))
+        {
+            Debug.Log($"[Server] Client {clientId} voted for rematch. Total: {rematchVotes.Count}");
+
+            if (rematchVotes.Count >= requiredPlayerCount)
+            {
+                Debug.Log("[Server] All players voted for rematch. Restarting...");
+                // ResetMatchState already clears rematchVotes, but clear explicitly for safety
+                rematchVotes.Clear();
+                ResetMatchState("Rematch Starting...");
+            }
+        }
     }
 
     public bool CanPlayerMove(ulong clientId)
