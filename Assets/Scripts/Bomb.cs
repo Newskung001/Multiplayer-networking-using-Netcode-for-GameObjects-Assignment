@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -10,6 +11,12 @@ public class Bomb : NetworkBehaviour
     [Header("Explosion")]
     [SerializeField]
     private GameObject explosionPrefab;
+
+    [SerializeField] private int damage = 1;
+    [SerializeField] private float explosionRadius = 2.5f;
+    [SerializeField] private LayerMask playerLayerMask = -1;
+
+    private bool exploded = false;
 
     [Header("Collision Trigger (Feature 6)")]
     [Tooltip("When true, the bomb detonates on contact with another object instead of using a timer.")]
@@ -70,6 +77,18 @@ public class Bomb : NetworkBehaviour
         lastLoggedSecond = Mathf.CeilToInt(timer);
         armTimer = armDelay;
         isArmed = false;
+        exploded = false;
+
+        Debug.Log(
+            $"[Server] Bomb OnNetworkSpawn | NetworkObjectId: {NetworkObjectId} "
+                + $"| RequestedByClientId: {requestedByClientId} "
+                + $"| Damage: {damage} "
+                + $"| Radius: {explosionRadius:F1} "
+                + $"| OwnerClientId: {OwnerClientId} "
+                + $"| TriggerMode: {(triggerByCollision ? "Collision" : "Timer")} "
+                + $"| Lifetime: {lifetime:F1}s "
+                + $"| Position: {transform.position}"
+        );
     }
 
     private void Update()
@@ -116,7 +135,7 @@ public class Bomb : NetworkBehaviour
 
         if (timer <= 0f)
         {
-            Detonate();
+            Explode();
         }
     }
 
@@ -152,53 +171,207 @@ public class Bomb : NetworkBehaviour
                 + $"| CollidedWithOwnerClientId: {otherNetObj.OwnerClientId}"
         );
 
-        Detonate();
+        Explode();
     }
 
-    /// <summary>
-    /// Spawn the explosion effect and despawn the bomb.
-    /// Used by both timer and collision trigger paths.
-    /// </summary>
-    private void Detonate()
+    private void Explode()
     {
-        if (explosionPrefab != null)
-        {
-            GameObject explosionInstance = Instantiate(
-                explosionPrefab,
-                transform.position,
-                Quaternion.identity
-            );
-            NetworkObject explosionNetworkObject =
-                explosionInstance.GetComponent<NetworkObject>();
-            if (explosionNetworkObject != null)
-            {
-                explosionNetworkObject.Spawn();
-                Debug.Log(
-                    $"[Server] Explosion spawned | FromBombId: {NetworkObjectId} "
-                        + $"| RequestedByClientId: {requestedByClientId} "
-                        + $"| ExplosionNetworkObjectId: {explosionNetworkObject.NetworkObjectId} "
-                        + $"| TriggerMode: {(triggerByCollision ? "Collision" : "Timer")} "
-                        + $"| Position: {transform.position}"
-                );
-            }
-            else
-            {
-                Debug.LogError("Explosion prefab is missing NetworkObject.");
-                Destroy(explosionInstance);
-            }
-        }
-        else
-        {
-            Debug.LogWarning("Explosion prefab is not assigned on Bomb.");
-        }
+        if (!IsServer)
+            return;
+
+        if (exploded)
+            return;
+
+        exploded = true;
+
+        Debug.Log(
+            $"[Server] Bomb explode | NetworkObjectId: {NetworkObjectId} "
+                + $"| RequestedByClientId: {requestedByClientId} "
+                + $"| OwnerClientId: {OwnerClientId} "
+                + $"| Position: {transform.position}"
+        );
+
+        ApplyExplosionDamage();
+        SpawnExplosionEffect();
 
         Debug.Log(
             $"[Server] Bomb despawning | NetworkObjectId: {NetworkObjectId} "
                 + $"| RequestedByClientId: {requestedByClientId} "
                 + $"| OwnerClientId: {OwnerClientId} "
-                + $"| TriggerMode: {(triggerByCollision ? "Collision" : "Timer")} "
                 + $"| Final Position: {transform.position}"
         );
-        NetworkObject.Despawn();
+
+        if (NetworkObject != null && NetworkObject.IsSpawned)
+        {
+            NetworkObject.Despawn();
+        }
+    }
+
+    private void ApplyExplosionDamage()
+    {
+        Collider[] hits = Physics.OverlapSphere(
+            transform.position,
+            explosionRadius,
+            playerLayerMask,
+            QueryTriggerInteraction.Collide
+        );
+
+        HashSet<ulong> damagedPlayerIds = new HashSet<ulong>();
+
+        Debug.Log(
+            $"[Server] Bomb damage check | NetworkObjectId: {NetworkObjectId} "
+                + $"| HitColliders: {hits.Length}"
+        );
+
+        foreach (Collider hit in hits)
+        {
+            PlayerHealth playerHealth = hit.GetComponentInParent<PlayerHealth>();
+            if (playerHealth == null)
+            {
+                continue;
+            }
+
+            ulong targetOwnerId = playerHealth.OwnerClientId;
+            if (damagedPlayerIds.Contains(targetOwnerId))
+            {
+                continue;
+            }
+
+            damagedPlayerIds.Add(targetOwnerId);
+
+            Debug.Log(
+                $"[Server] Bomb hit player | NetworkObjectId: {NetworkObjectId} "
+                    + $"| TargetOwnerClientId: {targetOwnerId} "
+                    + $"| Damage: {damage}"
+            );
+
+            playerHealth.ApplyDamage(damage);
+        }
+
+        // Fallback for cases where the collider query misses a player because of
+        // hierarchy, trigger, or prefab-layer setup differences.
+        DamageConnectedPlayersInRange(damagedPlayerIds);
+    }
+
+    private void DamageConnectedPlayersInRange(HashSet<ulong> damagedPlayerIds)
+    {
+        if (NetworkManager.Singleton == null || !NetworkManager.Singleton.IsServer)
+        {
+            return;
+        }
+
+        if (NetworkManager.Singleton.ConnectedClients == null)
+        {
+            return;
+        }
+
+        float radiusSqr = explosionRadius * explosionRadius;
+
+        foreach (var client in NetworkManager.Singleton.ConnectedClients.Values)
+        {
+            if (client?.PlayerObject == null)
+            {
+                continue;
+            }
+
+            PlayerHealth playerHealth = client.PlayerObject.GetComponent<PlayerHealth>();
+            if (playerHealth == null)
+            {
+                continue;
+            }
+
+            ulong targetOwnerId = playerHealth.OwnerClientId;
+            if (damagedPlayerIds.Contains(targetOwnerId))
+            {
+                continue;
+            }
+
+            if (!IsPlayerWithinExplosionRadius(playerHealth, radiusSqr))
+            {
+                continue;
+            }
+
+            damagedPlayerIds.Add(targetOwnerId);
+
+            Debug.Log(
+                $"[Server] Bomb fallback hit player | NetworkObjectId: {NetworkObjectId} "
+                    + $"| TargetOwnerClientId: {targetOwnerId} "
+                    + $"| Damage: {damage}"
+            );
+
+            playerHealth.ApplyDamage(damage);
+        }
+    }
+
+    private bool IsPlayerWithinExplosionRadius(PlayerHealth playerHealth, float radiusSqr)
+    {
+        if (playerHealth == null)
+        {
+            return false;
+        }
+
+        Collider[] colliders = playerHealth.GetComponentsInChildren<Collider>();
+        foreach (Collider collider in colliders)
+        {
+            if (collider == null || !collider.enabled)
+            {
+                continue;
+            }
+
+            Vector3 closestPoint = collider.ClosestPoint(transform.position);
+            if ((closestPoint - transform.position).sqrMagnitude <= radiusSqr)
+            {
+                return true;
+            }
+        }
+
+        float playerRootDistanceSqr = (playerHealth.transform.position - transform.position)
+            .sqrMagnitude;
+        return playerRootDistanceSqr <= radiusSqr;
+    }
+
+    private void SpawnExplosionEffect()
+    {
+        if (explosionPrefab == null)
+        {
+            Debug.LogWarning("Explosion prefab is not assigned on Bomb.");
+            return;
+        }
+
+        GameObject explosionInstance = Instantiate(
+            explosionPrefab,
+            transform.position,
+            Quaternion.identity
+        );
+
+        NetworkObject explosionNetworkObject = explosionInstance.GetComponent<NetworkObject>();
+        ExplosionEffect explosionEffect = explosionInstance.GetComponent<ExplosionEffect>();
+
+        if (explosionNetworkObject != null)
+        {
+            explosionNetworkObject.Spawn();
+
+            if (explosionEffect != null)
+            {
+                explosionEffect.SetRadiusServer(explosionRadius);
+            }
+
+            Debug.Log(
+                $"[Server] Explosion spawned | FromBombId: {NetworkObjectId} "
+                    + $"| ExplosionNetworkObjectId: {explosionNetworkObject.NetworkObjectId} "
+                    + $"| Position: {transform.position}"
+            );
+        }
+        else
+        {
+            Debug.LogError("Explosion prefab is missing NetworkObject.");
+            Destroy(explosionInstance);
+        }
+    }
+
+    private void OnDrawGizmosSelected()
+    {
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireSphere(transform.position, explosionRadius);
     }
 }

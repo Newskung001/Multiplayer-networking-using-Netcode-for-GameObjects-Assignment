@@ -43,6 +43,17 @@ public class PlayerRespawnDemo : NetworkBehaviour
             rpcDemo.ResetItemUses();
         }
 
+        // Restore HP on respawn so the player comes back at full health.
+        PlayerHealth playerHealth = GetComponent<PlayerHealth>();
+        if (playerHealth != null)
+        {
+            playerHealth.RestoreFullHealth();
+        }
+        else
+        {
+            Debug.LogWarning("[Server] PlayerHealth component not found during respawn.");
+        }
+
         ClientRpcParams targetParams = new ClientRpcParams
         {
             Send = new ClientRpcSendParams
