@@ -1,12 +1,24 @@
-using UnityEngine;
 using System.Text;
 using TMPro;
 using Unity.Netcode;
+using UnityEngine;
 
 public class MatchStatusUI : MonoBehaviour
 {
-    [SerializeField] private TMP_Text statusText;
-    [SerializeField] private float refreshInterval = 0.2f;
+    public enum UIMode
+    {
+        PlayerList,    // Displays the list of players with HP/Alive status
+        MatchResult    // Displays the MatchStatusMessage (Waiting, Started, Winner, etc.)
+    }
+
+    [SerializeField]
+    private TMP_Text statusText;
+
+    [SerializeField]
+    private float refreshInterval = 0.2f;
+
+    [SerializeField]
+    private UIMode mode = UIMode.PlayerList;
 
     private float refreshTimer;
 
@@ -34,11 +46,20 @@ public class MatchStatusUI : MonoBehaviour
             return;
         }
 
+        if (mode == UIMode.MatchResult)
+        {
+            if (MatchManager.Instance != null)
+            {
+                statusText.text = MatchManager.Instance.MatchStatusMessage.Value.ToString();
+            }
+            return;
+        }
+
+        // --- PlayerList Mode ---
         StringBuilder sb = new StringBuilder();
         sb.AppendLine("Players");
 
         // Use SpawnManager to find player objects since ConnectedClientsList is server-side only.
-        // This ensures the status panel displays player info correctly on both host and client.
         var playerObjects = new System.Collections.Generic.List<NetworkObject>();
         foreach (var netObj in NetworkManager.Singleton.SpawnManager.SpawnedObjectsList)
         {
@@ -48,7 +69,7 @@ public class MatchStatusUI : MonoBehaviour
             }
         }
 
-        // Sort by OwnerClientId to keep a consistent display order across all clients.
+        // Sort by OwnerClientId to keep a consistent display order.
         playerObjects.Sort((a, b) => a.OwnerClientId.CompareTo(b.OwnerClientId));
 
         foreach (var playerNetObj in playerObjects)
