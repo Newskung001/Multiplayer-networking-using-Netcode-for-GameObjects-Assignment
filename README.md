@@ -9,6 +9,7 @@ This educational project teaches the fundamentals of implementing player movemen
 ## 📺 Demo Video
 
 Watch a demonstration of this project in action. Note that videos may or may not reflect all features the game currently has:
+- [YouTube Demo Video v1.8.0 - Match Management, Player Health & Rematch System](https://youtu.be/CNuqDFzaBOo)
 - [YouTube Demo Video v1.7.0 - Bomb System & Advanced Gameplay Rules](https://youtu.be/S_bNccx_Vls)
 - [YouTube Demo Video v1.6.0 - Item Usage, Respawn & Warnings](https://youtu.be/ayDatHFu2ls)
 - [YouTube Demo Video v1.5.0 - Character Selection & Team Colors](https://youtu.be/q5bilQQiywA) 
@@ -32,6 +33,9 @@ Watch a demonstration of this project in action. Note that videos may or may not
 - **Character Selection UI** - Players can choose from multiple avatars before joining the game
 - **Team Color & Naming UI Improvements** - Team index is now applied to player prefab visuals and `PlayerName` updates when team colors change; host-specific state handling added to `PlayerStateSync`
 - **Item Usage & Respawn** - Players can use items via RPC calls, with usage count UI updates, reset functionality, and a warning UI when uses are depleted.
+- **Match Management & Round Flow** - Server-side `MatchManager` handles waiting for players, starting the round, movement locking, and determining winners/draws.
+- **Player Health System** - Networked `PlayerHealth` tracks HP and alive status; integrated with the bomb system for server-side damage application.
+- **Rematch Voting & Timer** - Post-match UI allows players to vote for a rematch with a 30-second countdown; automatically handles player disconnects by updating the vote requirements.
 - **Networked Bomb System** - Players can place bombs that countdown and explode, spawning an `ExplosionEffect` on all clients with a 3D sound effect.
 - **Bomb Placement Cooldown** - Server-side cooldown prevents bomb spamming; rejected clients are notified via `ClientRpc`.
 - **Active Bomb Limit** - Configurable cap on simultaneous live bombs per player, tracked server-side with `NetworkObjectReference`.
@@ -67,7 +71,10 @@ Watch a demonstration of this project in action. Note that videos may or may not
 ```
 Assets/
 ├── Scripts/
-│   ├── MainPlayerScript.cs      # Player movement, jump, and input handling
+│   ├── MatchManager.cs          # Centralized match flow, player count, and rematch logic
+│   ├── PlayerHealth.cs          # Networked HP management and damage application
+│   ├── MatchResultUI.cs         # Game Over UI, rematch voting status, and exit logic
+│   ├── MainPlayerScript.cs      # Player movement, jump, and input handling (with movement locking)
 │   ├── MainGameManagerScript.cs # Network connection management
 │   ├── PlayerBombSpawner.cs     # Input → ServerRpc bomb spawn with cooldown & limit
 │   ├── Bomb.cs                  # Server countdown/collision detonation & NetworkVariable requester ID

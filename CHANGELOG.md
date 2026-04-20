@@ -5,6 +5,26 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v1.8.0] - 2026-04-21
+
+### Added
+- **Match Management System**: Centralized match flow in `MatchManager.cs`. The server now waits for a required number of players (default 2) before starting the round.
+- **Player Health & Survival**: Implemented `PlayerHealth` with networked `CurrentHP` and `IsAlive` variables. Damage from bombs is calculated server-side and synchronized across all clients.
+- **Movement Locking**: Players are automatically locked from moving before a match starts, after being defeated, or when the match concludes.
+- **Rematch Voting System**: A post-match voting mechanic that requires all connected players to agree before a new round begins. Supports dynamic player count updates if someone leaves during the voting phase.
+- **Match Timer**: A 30-second countdown during the Game Over state; the match automatically resets if the timer expires.
+- **Game Over UI**: A dedicated `MatchResultUI` panel that displays the winner, rematch status ("X/Y voted"), and the countdown timer.
+- **Exit Logic**: Integrated an "Exit" button that safely shuts down the NetworkManager and reloads the scene for a clean return to the login screen.
+
+### Fixed
+- **UI Initialization**: Implemented a coroutine-based wait in `MatchResultUI` to ensure the `MatchManager` is fully networked before syncing state, preventing race conditions on Clients.
+- **UI Layering**: Added `SetAsLastSibling()` logic to ensure the Game Over panel always renders on top of dynamic player name tags.
+
+### Git Commits
+- Commits: [5c4b935..81a69b1](https://github.com/Newskung001/Multiplayer-networking-using-Netcode-for-GameObjects-Assignment/compare/5c4b935b766ec0e110ed6916730c5dfc540e041a...81a69b1d62598d1d8a9a6579c4edf677dc638ec1) (`5c4b935`, `da61709`, `290b200`, `5d8cd3b`, `87947f1`, `81a69b1`)
+- Author: Newskung001
+- Date: 2026-04-21
+
 ## [v1.7.0] - 2026-03-29
 
 ### Added
