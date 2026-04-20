@@ -31,6 +31,12 @@ public class MatchManager : NetworkBehaviour
             NetworkVariableWritePermission.Server
         );
 
+    [Header("Rematch Settings")]
+    public NetworkVariable<int> RematchVoteCount = new NetworkVariable<int>(0);
+    public NetworkVariable<int> TotalPlayers = new NetworkVariable<int>(0);
+    public NetworkVariable<float> RematchTimer = new NetworkVariable<float>(30f);
+    private const float RematchDuration = 30f;
+
     [SerializeField]
     private float checkInterval = 0.2f;
 
@@ -61,6 +67,19 @@ public class MatchManager : NetworkBehaviour
     {
         if (!IsServer)
             return;
+
+        // Handle Rematch Timer and Player Count sync when match is over
+        if (IsMatchOver.Value)
+        {
+            TotalPlayers.Value = NetworkManager.Singleton.ConnectedClients.Count;
+            RematchTimer.Value -= Time.deltaTime;
+
+            if (RematchTimer.Value <= 0f)
+            {
+                Debug.Log("[Server] Rematch timer expired. Resetting match.");
+                ResetMatchState("Rematch Timed Out");
+            }
+        }
 
         checkTimer -= Time.deltaTime;
         if (checkTimer <= 0f)
@@ -184,6 +203,8 @@ public class MatchManager : NetworkBehaviour
         if (IsServer)
         {
             rematchVotes.Clear();
+            RematchVoteCount.Value = 0;
+            RematchTimer.Value = RematchDuration;
         }
     }
 
@@ -196,13 +217,16 @@ public class MatchManager : NetworkBehaviour
         ulong clientId = rpcParams.Receive.SenderClientId;
         if (rematchVotes.Add(clientId))
         {
-            Debug.Log($"[Server] Client {clientId} voted for rematch. Total: {rematchVotes.Count}");
+            RematchVoteCount.Value = rematchVotes.Count;
+            int currentTotal = NetworkManager.Singleton.ConnectedClients.Count;
+            TotalPlayers.Value = currentTotal;
 
-            if (rematchVotes.Count >= requiredPlayerCount)
+            Debug.Log($"[Server] Client {clientId} voted for rematch. Total: {RematchVoteCount.Value}/{currentTotal}");
+
+            // Start rematch if everyone currently connected has voted (min 2)
+            if (RematchVoteCount.Value >= currentTotal && currentTotal >= requiredPlayerCount)
             {
                 Debug.Log("[Server] All players voted for rematch. Restarting...");
-                // ResetMatchState already clears rematchVotes, but clear explicitly for safety
-                rematchVotes.Clear();
                 ResetMatchState("Rematch Starting...");
             }
         }

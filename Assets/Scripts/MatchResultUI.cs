@@ -16,6 +16,7 @@ public class MatchResultUI : MonoBehaviour
     [SerializeField] private Button rematchButton;
     [SerializeField] private Button exitButton;
     [SerializeField] private TMP_Text rematchButtonText;
+    [SerializeField] private TMP_Text gameOverStatusText;
 
     private bool isInitialized = false;
 
@@ -71,13 +72,24 @@ public class MatchResultUI : MonoBehaviour
         // Ensure we check the current state immediately
         bool currentlyOver = MatchManager.Instance.IsMatchOver.Value;
         OnMatchOverChanged(false, currentlyOver);
+        UpdateRematchStatusText();
 
         // Subscribe to future changes
         MatchManager.Instance.MatchStatusMessage.OnValueChanged += UpdateResultText;
         MatchManager.Instance.IsMatchOver.OnValueChanged += OnMatchOverChanged;
+        MatchManager.Instance.RematchVoteCount.OnValueChanged += UpdateRematchStatus;
+        MatchManager.Instance.TotalPlayers.OnValueChanged += UpdateRematchStatus;
 
         isInitialized = true;
         Debug.Log($"[MatchResultUI] Initialized. Current Match Over state: {currentlyOver}");
+    }
+
+    private void Update()
+    {
+        if (isInitialized && MatchManager.Instance != null && MatchManager.Instance.IsMatchOver.Value)
+        {
+            UpdateTimerUI();
+        }
     }
 
     private void OnDestroy()
@@ -86,6 +98,8 @@ public class MatchResultUI : MonoBehaviour
         {
             MatchManager.Instance.MatchStatusMessage.OnValueChanged -= UpdateResultText;
             MatchManager.Instance.IsMatchOver.OnValueChanged -= OnMatchOverChanged;
+            MatchManager.Instance.RematchVoteCount.OnValueChanged -= UpdateRematchStatus;
+            MatchManager.Instance.TotalPlayers.OnValueChanged -= UpdateRematchStatus;
         }
     }
 
@@ -97,20 +111,52 @@ public class MatchResultUI : MonoBehaviour
         }
     }
 
+    private void UpdateRematchStatus(int previousValue, int newValue)
+    {
+        UpdateRematchStatusText();
+    }
+
+    private void UpdateRematchStatusText()
+    {
+        if (gameOverStatusText != null && MatchManager.Instance != null)
+        {
+            int votes = MatchManager.Instance.RematchVoteCount.Value;
+            int total = MatchManager.Instance.TotalPlayers.Value;
+            gameOverStatusText.text = $"Rematching {votes}/{total} voted";
+        }
+    }
+
+    private void UpdateTimerUI()
+    {
+        if (gameOverStatusText != null && MatchManager.Instance != null)
+        {
+            float timeRemaining = Mathf.Max(0, MatchManager.Instance.RematchTimer.Value);
+            int votes = MatchManager.Instance.RematchVoteCount.Value;
+            int total = MatchManager.Instance.TotalPlayers.Value;
+            gameOverStatusText.text = $"Rematching {votes}/{total} voted\nTime Remaining: {timeRemaining:F1}s";
+        }
+    }
+
     private void OnMatchOverChanged(bool previousValue, bool newValue)
     {
         Debug.Log($"[MatchResultUI] Match Over state changed to: {newValue}");
         
         if (gameOverPanel != null)
         {
-            // This is the line that shows the panel when the match ends!
             gameOverPanel.SetActive(newValue);
+
+            // Move the panel to the front of the UI hierarchy so it's not overlapped by player names
+            if (newValue)
+            {
+                gameOverPanel.transform.SetAsLastSibling();
+            }
         }
 
         if (newValue == false)
         {
             if (rematchButton != null) rematchButton.interactable = true;
             if (rematchButtonText != null) rematchButtonText.text = "Rematch";
+            if (gameOverStatusText != null) gameOverStatusText.text = "";
         }
     }
 
