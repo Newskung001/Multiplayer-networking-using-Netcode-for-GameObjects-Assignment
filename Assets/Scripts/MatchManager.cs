@@ -65,7 +65,7 @@ public class MatchManager : NetworkBehaviour
 
     private void Update()
     {
-        if (!IsServer)
+        if (!IsServer || NetworkManager.Singleton == null)
             return;
 
         // Handle Rematch Timer and Player Count sync when match is over
@@ -91,6 +91,9 @@ public class MatchManager : NetworkBehaviour
 
     private void CheckMatchFlow()
     {
+        if (NetworkManager.Singleton == null || NetworkManager.Singleton.SpawnManager == null)
+            return;
+
         // Use SpawnManager to find player objects accurately on the server.
         var playerHealths = new System.Collections.Generic.List<PlayerHealth>();
         foreach (var netObj in NetworkManager.Singleton.SpawnManager.SpawnedObjectsList)

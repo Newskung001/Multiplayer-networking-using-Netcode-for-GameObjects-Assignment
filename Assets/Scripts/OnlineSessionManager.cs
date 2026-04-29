@@ -51,6 +51,13 @@ public class OnlineSessionManager : MonoBehaviour
         {
             InitializationOptions options = new InitializationOptions();
 
+#if UNITY_EDITOR
+            if (ParrelSync.ClonesManager.IsClone())
+            {
+                authProfileName = "clone";
+            }
+#endif
+
             if (!string.IsNullOrWhiteSpace(authProfileName))
             {
                 options.SetProfile(authProfileName);
