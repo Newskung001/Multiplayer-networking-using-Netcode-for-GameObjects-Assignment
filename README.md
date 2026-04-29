@@ -9,6 +9,7 @@ This educational project teaches the fundamentals of implementing player movemen
 ## 📺 Demo Video
 
 Watch a demonstration of this project in action. Note that videos may or may not reflect all features the game currently has:
+- [YouTube Demo Video v1.9.0 - Session Management & Lobby UI](https://youtu.be/Eum2aixvNJc)
 - [YouTube Demo Video v1.8.0 - Match Management, Player Health & Rematch System](https://youtu.be/CNuqDFzaBOo)
 - [YouTube Demo Video v1.7.0 - Bomb System & Advanced Gameplay Rules](https://youtu.be/S_bNccx_Vls)
 - [YouTube Demo Video v1.6.0 - Item Usage, Respawn & Warnings](https://youtu.be/ayDatHFu2ls)
@@ -42,7 +43,8 @@ Watch a demonstration of this project in action. Note that videos may or may not
 - **`SpawnWithOwnership()` Comparison** - Inspector toggle to switch between `Spawn()` (server-owned) and `SpawnWithOwnership()` (player-owned) to explore ownership behaviour differences.
 - **Networked Bomb Requester ID** - `NetworkVariable<ulong>` on `Bomb` exposes the placing player's ID to all clients.
 - **Collision-Triggered Bombs** - Optional bomb mode that detonates on contact with a networked object instead of a timer, with configurable arm delay.
-
+- **Online Session Management** - Online session management using Unity Services for robust multiplayer connectivity.
+- **Lobby UI** - Lobby UI integration in the SampleScene with LobbyClient support and adjusted UI layout.
 ## Prerequisites
 
 - **Unity 2022.3+** (URP - Universal Render Pipeline)

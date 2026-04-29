@@ -44,7 +44,7 @@ public class MatchManager : NetworkBehaviour
     private int requiredPlayerCount = 2;
 
     private float checkTimer;
-    private readonly System.Collections.Generic.HashSet<ulong> rematchVotes = 
+    private readonly System.Collections.Generic.HashSet<ulong> rematchVotes =
         new System.Collections.Generic.HashSet<ulong>();
 
     private void Awake()
@@ -101,10 +101,11 @@ public class MatchManager : NetworkBehaviour
             if (netObj.IsPlayerObject)
             {
                 PlayerHealth ph = netObj.GetComponent<PlayerHealth>();
-                if (ph != null) playerHealths.Add(ph);
+                if (ph != null)
+                    playerHealths.Add(ph);
             }
         }
-        
+
         int totalPlayers = playerHealths.Count;
 
         if (totalPlayers < requiredPlayerCount)
@@ -202,7 +203,7 @@ public class MatchManager : NetworkBehaviour
         IsMatchOver.Value = false;
         WinnerName.Value = "";
         MatchStatusMessage.Value = statusMessage;
-        
+
         if (IsServer)
         {
             rematchVotes.Clear();
@@ -224,7 +225,9 @@ public class MatchManager : NetworkBehaviour
             int currentTotal = NetworkManager.Singleton.ConnectedClients.Count;
             TotalPlayers.Value = currentTotal;
 
-            Debug.Log($"[Server] Client {clientId} voted for rematch. Total: {RematchVoteCount.Value}/{currentTotal}");
+            Debug.Log(
+                $"[Server] Client {clientId} voted for rematch. Total: {RematchVoteCount.Value}/{currentTotal}"
+            );
 
             // Start rematch if everyone currently connected has voted (min 2)
             if (RematchVoteCount.Value >= currentTotal && currentTotal >= requiredPlayerCount)
@@ -255,7 +258,8 @@ public class MatchManager : NetworkBehaviour
             if (netObj.IsPlayerObject && netObj.OwnerClientId == clientId)
             {
                 PlayerHealth ph = netObj.GetComponent<PlayerHealth>();
-                if (ph != null) return ph.IsAlive.Value;
+                if (ph != null)
+                    return ph.IsAlive.Value;
             }
         }
 

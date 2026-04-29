@@ -5,6 +5,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v1.9.0] - 2026-04-29
+
+### Added
+- **Online Session Management**: Implemented online session management using Unity Services for robust multiplayer connectivity.
+- **Lobby UI**: Added a `LobbyClient` button and placeholder UI elements to the `SampleScene` for lobby interaction.
+
+### Fixed
+- **Session Stability**: Improved session management and stability to ensure reliable network connections.
+- **UI Layout**: Adjusted anchored positions for UI elements in `SampleScene` for better alignment across resolutions.
+
+### Git Commits
+- Commits: [ab1d228..5b7e9b1](https://github.com/Newskung001/Multiplayer-networking-using-Netcode-for-GameObjects-Assignment/compare/ab1d228...5b7e9b1f2b6c4890bd7c3367c365bc9cf9eea34b) (`ab1d228`, `b37f969`, `9da503b`, `2a71b4c`, `5b7e9b1`)
+- Author: Newskung001
+- Date: 2026-04-29
+
+---
+
 ## [v1.8.0] - 2026-04-21
 
 ### Added
