@@ -9,6 +9,7 @@ This educational project teaches the fundamentals of implementing player movemen
 ## 📺 Demo Video
 
 Watch a demonstration of this project in action. Note that videos may or may not reflect all features the game currently has:
+- [YouTube Demo Video v1.9.0 - Quick Join & Lobby Integration](https://youtu.be/OOuHBYSL-4Q)
 - [YouTube Demo Video v1.8.0 - Match Management, Player Health & Rematch System](https://youtu.be/CNuqDFzaBOo)
 - [YouTube Demo Video v1.7.0 - Bomb System & Advanced Gameplay Rules](https://youtu.be/S_bNccx_Vls)
 - [YouTube Demo Video v1.6.0 - Item Usage, Respawn & Warnings](https://youtu.be/ayDatHFu2ls)
@@ -36,6 +37,10 @@ Watch a demonstration of this project in action. Note that videos may or may not
 - **Match Management & Round Flow** - Server-side `MatchManager` handles waiting for players, starting the round, movement locking, and determining winners/draws.
 - **Player Health System** - Networked `PlayerHealth` tracks HP and alive status; integrated with the bomb system for server-side damage application.
 - **Rematch Voting & Timer** - Post-match UI allows players to vote for a rematch with a 30-second countdown; automatically handles player disconnects by updating the vote requirements.
+- **Quick Join Session Manager** - `QuickJoinSessionManager` automatically searches for an available lobby and joins as a client, or creates a new relay lobby and acts as host if none is found — all in one click.
+- **Lobby & Relay Integration** - Uses Unity Authentication, Lobby Service, and Relay Allocation so players can connect automatically without a shared IP address.
+- **Lobby Heartbeat** - Host keeps its lobby alive with a 15-second ping heartbeat so it does not expire mid-session.
+- **Leave Session** - Players can cleanly leave the session; the host deletes the lobby, clients remove themselves, and UI resets to the login screen.
 - **Networked Bomb System** - Players can place bombs that countdown and explode, spawning an `ExplosionEffect` on all clients with a 3D sound effect.
 - **Bomb Placement Cooldown** - Server-side cooldown prevents bomb spamming; rejected clients are notified via `ClientRpc`.
 - **Active Bomb Limit** - Configurable cap on simultaneous live bombs per player, tracked server-side with `NetworkObjectReference`.
@@ -56,7 +61,7 @@ Watch a demonstration of this project in action. Note that videos may or may not
 3. Open the `SampleScene` from `Assets/Scenes/`
 4. Ensure NetworkManager is configured in the scene
 5. Press **Play** in the Unity Editor
-6. Use the UI buttons to start as Host, Client, or Server
+6. Use the UI buttons to start as Host, Client, or Server (or use **LobbyClient** for relay-auto matchmaking)
 
 ## Controls
 
@@ -65,32 +70,35 @@ Watch a demonstration of this project in action. Note that videos may or may not
 | Move | WASD or Arrow Keys |
 | Jump | Space |
 | Place Bomb | Configured via Input Action Asset (`PlaceBomb`) |
+| Start Online / Quick Join | **LobbyClient** button in the scene — searches for a lobby or creates a new relay room |
 
 ## Project Structure
 
 ```
 Assets/
 ├── Scripts/
-│   ├── MatchManager.cs          # Centralized match flow, player count, and rematch logic
-│   ├── PlayerHealth.cs          # Networked HP management and damage application
-│   ├── MatchResultUI.cs         # Game Over UI, rematch voting status, and exit logic
-│   ├── MainPlayerScript.cs      # Player movement, jump, and input handling (with movement locking)
-│   ├── MainGameManagerScript.cs # Network connection management
-│   ├── PlayerBombSpawner.cs     # Input → ServerRpc bomb spawn with cooldown & limit
-│   ├── Bomb.cs                  # Server countdown/collision detonation & NetworkVariable requester ID
-│   ├── ExplosionEffect.cs       # Timed NetworkObject despawn + 3D explosion audio
-│   ├── PlayerStateSync.cs       # Player name, team color, and status synchronization
-│   ├── PlayerRpcDemo.cs         # Item use RPCs and usage count NetworkVariable
-│   ├── ConnectionManager.cs     # Connection approval, player limits, username validation
-│   └── CharacterSelectUI.cs     # Pre-join character/avatar selection UI
+│   ├── MatchManager.cs               # Centralized match flow, player count, and rematch logic
+│   ├── MatchResultUI.cs              # Game Over UI, rematch voting status, and exit logic
+│   ├── MainGameManagerScript.cs      # Network connection management
+│   ├── MainPlayerScript.cs           # Player movement, jump, and input handling (with movement locking)
+│   ├── OnlineSessionManager.cs       # Unity Services initialization and relay host startup
+│   ├── PlayerBombSpawner.cs          # Input → ServerRpc bomb spawn with cooldown & limit
+│   ├── PlayerHealth.cs               # Networked HP management and damage application
+│   ├── PlayerRpcDemo.cs              # Item use RPCs and usage count NetworkVariable
+│   ├── PlayerStateSync.cs            # Player name, team color, and status synchronization
+│   ├── Bomb.cs                       # Server countdown/collision detonation & NetworkVariable requester ID
+│   ├── CharacterSelectUI.cs          # Pre-join character/avatar selection UI
+│   ├── ConnectionManager.cs          # Connection approval, player limits, username validation
+│   ├── ExplosionEffect.cs            # Timed NetworkObject despawn + 3D explosion audio
+│   └── QuickJoinSessionManager.cs    # Auto-search/join lobby or create relay room
 ├── Prefabs/
-│   ├── Player.prefab            # Networked player prefab with NetworkObject & NetworkTransform
-│   ├── Bomb.prefab              # Networked bomb with Bomb script and collider
-│   └── Explosion.prefab         # Networked explosion effect with ExplosionEffect script
+│   ├── Player.prefab                 # Networked player prefab with NetworkObject & NetworkTransform
+│   ├── Bomb.prefab                   # Networked bomb with Bomb script and collider
+│   └── Explosion.prefab              # Networked explosion effect with ExplosionEffect script
 ├── Audio/
-│   └── explosion.wav            # Explosion sound effect (see Credits)
+│   └── explosion.wav                 # Explosion sound effect (see Credits)
 └── Scenes/
-    └── SampleScene.unity        # Main game scene
+    └── SampleScene.unity             # Main game scene
 ```
 
 ## Learning Resources

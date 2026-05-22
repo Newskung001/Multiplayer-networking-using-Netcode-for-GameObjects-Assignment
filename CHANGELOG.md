@@ -5,6 +5,33 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v1.9.0] - 2026-05-23
+
+### Added
+- **Quick Join Session Manager**: New `QuickJoinSessionManager.cs` that automatically searches for existing lobbies via Unity Lobby Service or creates a new one if none are found. Integrates Unity Authentication, Relay, and Lobby services in a single streamlined flow.
+- **Leave Session Logic**: New `LeaveSession()` method that safely shuts down the network connection, removes the player from the lobby, and resets the UI to the initial connect state.
+- **Lobby Heartbeat**: 15-second coroutine (`HeartbeatLobbyCoroutine`) keeps the host lobby alive via `SendHeartbeatPingAsync` while the round is in progress.
+- **LobbyClient Button**: LobbyClient entry point added to `SampleScene` as a new UI button alongside the existing Host/Client/Server buttons.
+
+### Changed
+- **`ConnectionManager.cs`**: `LocalUsername` and `LocalCharacterId` changed to `{ get; set; }` so `QuickJoinSessionManager` can write local state before the netcode roundtrip. Added `startButton` field that is hidden (`SetActive(false)` / non-interactable) once a connection is established and restored on disconnect.
+- **`OnlineSessionManager.cs`**: Auth profile `"client"` is now mapped to `"client1"` to avoid collision in Unity Services. Status UI now shows both `PlayerId` and active `Profile` name.
+- **`ConnectionManager.cs` – `SetUIConnected()`**: Added a `startButton` sub-tree toggle so the start button is hidden and disabled once connected, and fully restored on disconnect through `ResetUI()`.
+- **`QuickJoinSessionManager.cs` – `PrepareConnectionPayload()`**: Prioritises `CharacterSelectUI` (falling back to `characterDropdown` if unavailable) to resolve the character ID from the UI rather than the input field alone.
+- **Package Dependencies**: `manifest.json` and `packages-lock.json` updated to reflect latest compatible Unity package versions.
+- **SampleScene UI Anchors**: Fixed four UI element anchor positions to keep layout stable across screens and Unity Editor versions.
+
+### Fixed
+- **Client Profile Collision**: `OnlineSessionManager` now maps the legacy `"client"` profile to `"client1"` to prevent authentication conflicts.
+- **UI Anchor Misalignment**: Corrected anchored positions of sample UI elements in `SampleScene` so panels remain consistently positioned.
+
+### Git Commits
+- Commits: [`ab1d228`..`3c27097`](https://github.com/Newskung001/Multiplayer-networking-using-Netcode-for-GameObjects-Assignment/compare/ab1d2285939785b04bf2f1d527ff1745ddfee597...3c27097f630a674aca301882ad123520190aaa14) (`b37f969`, `9da503b`, `2a71b4c`, `70a1db6`, `3c27097`)
+- Author: Newskung001
+- Date: 2026-05-23
+
+---
+
 ## [v1.8.0] - 2026-04-21
 
 ### Added
