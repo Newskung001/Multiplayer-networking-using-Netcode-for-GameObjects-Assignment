@@ -12,7 +12,7 @@ public class ConnectionManager : MonoBehaviour
 {
     // singleton access so other objects can read local username after spawn
     public static ConnectionManager Instance { get; private set; }
-    public string LocalUsername { get; private set; } = "";
+    public string LocalUsername { get; set; } = "";
     public Button startButton;
 
     [SerializeField] TMP_InputField usernameInput;
@@ -28,7 +28,7 @@ public class ConnectionManager : MonoBehaviour
     [SerializeField] private CharacterSelectUI characterSelectUI; // visual picker component
 
     // store the locally chosen character index so spawned players can access it
-    public int LocalCharacterId { get; private set; } = 0;
+    public int LocalCharacterId { get; set; } = 0;
 
     // list of prefab hashes corresponding to dropdown index; element 0 = default
     [SerializeField] private List<uint> alternatePlayerPrefabHashes = new List<uint>();

@@ -3518,6 +3518,7 @@ MonoBehaviour:
   loginPanel: {fileID: 477329548}
   usernameInput: {fileID: 69943206}
   characterDropdown: {fileID: 546522422}
+  characterSelectUI: {fileID: 2056003717}
   startButton: {fileID: 1071239244}
   leaveButton: {fileID: 1144130949}
   statusText: {fileID: 1556527849}
@@ -8792,6 +8793,7 @@ MonoBehaviour:
   ConnectionData:
     Address: 127.0.0.1
     Port: 7777
+    WebSocketPath: /
     ServerListenAddress: 127.0.0.1
     ClientBindPort: 0
   DebugSimulator:

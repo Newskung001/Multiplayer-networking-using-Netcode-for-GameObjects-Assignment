@@ -25,6 +25,7 @@ public class QuickJoinSessionManager : MonoBehaviour
     public GameObject loginPanel;
     public TMP_InputField usernameInput;
     public TMP_Dropdown characterDropdown;
+    public CharacterSelectUI characterSelectUI;
     public Button startButton;
     public Button leaveButton;
     public TMP_Text statusText;
@@ -50,6 +51,11 @@ public class QuickJoinSessionManager : MonoBehaviour
 
     private void Start()
     {
+        if (characterSelectUI == null)
+        {
+            characterSelectUI = FindObjectOfType<CharacterSelectUI>();
+        }
+
         if (leaveButton != null)
         {
             leaveButton.gameObject.SetActive(false);
@@ -266,12 +272,28 @@ public class QuickJoinSessionManager : MonoBehaviour
     private bool PrepareConnectionPayload()
     {
         string userName = usernameInput.text.Trim();
-        int characterId = characterDropdown.value;
+
+        int characterId = 0;
+        if (characterSelectUI != null)
+        {
+            characterId = characterSelectUI.SelectedCharacterIndex;
+        }
+        else if (characterDropdown != null)
+        {
+            characterId = characterDropdown.value;
+        }
 
         if (string.IsNullOrWhiteSpace(userName))
         {
             SetStatus("Please enter username.");
             return false;
+        }
+
+        // Store locally so PlayerStateSync can access it on spawning
+        if (ConnectionManager.Instance != null)
+        {
+            ConnectionManager.Instance.LocalUsername = userName;
+            ConnectionManager.Instance.LocalCharacterId = characterId;
         }
 
         string payload = $"{userName}|{characterId}";
