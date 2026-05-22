@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
+using UnityEngine.UI;
 using Unity.Netcode;
 using QFSW.QC;
 using TMPro;
@@ -12,6 +13,7 @@ public class ConnectionManager : MonoBehaviour
     // singleton access so other objects can read local username after spawn
     public static ConnectionManager Instance { get; private set; }
     public string LocalUsername { get; private set; } = "";
+    public Button startButton;
 
     [SerializeField] TMP_InputField usernameInput;
     [SerializeField] GameObject loginPanel;
@@ -424,8 +426,15 @@ public class ConnectionManager : MonoBehaviour
 
     private void SetUIConnected(bool connected)
     {
+        Debug.Log($"Connected: {connected}");
         loginPanel.SetActive(!connected);
         leaveButton.SetActive(connected);
+
+        if (startButton != null)
+        {
+            startButton.gameObject.SetActive(!connected);
+            startButton.interactable = !connected;
+        }
 
         if (connected)
             ClearError();

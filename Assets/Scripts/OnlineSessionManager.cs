@@ -53,7 +53,12 @@ public class OnlineSessionManager : MonoBehaviour
 
             if (!string.IsNullOrWhiteSpace(authProfileName))
             {
-                options.SetProfile(authProfileName);
+                string profile = authProfileName;
+                if (profile == "client")
+                {
+                    profile = "client1";
+                }
+                options.SetProfile(profile);
             }
 
             await UnityServices.InitializeAsync(options);
@@ -66,7 +71,8 @@ public class OnlineSessionManager : MonoBehaviour
         }
 
         string playerId = AuthenticationService.Instance.PlayerId;
-        SetStatus("Signed in: " + playerId);
+        string activeProfile = AuthenticationService.Instance.Profile;
+        SetStatus($"Signed in: {playerId} (Profile: {activeProfile})");
     }
 
     public async void StartRelayHost()
